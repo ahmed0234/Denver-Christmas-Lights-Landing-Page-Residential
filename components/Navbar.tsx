@@ -6,8 +6,6 @@ import { ThemeLogoIcon } from "@/components/ThemeLogo";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
 
 export default function Navbar() {
-
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 pt-3 sm:pt-4 md:pt-6 px-3 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 pointer-events-none">
       <div className="w-full mx-auto pointer-events-auto">
@@ -38,7 +36,7 @@ export default function Navbar() {
           <div className="flex items-center h-full shrink-0">
             <a
               href="#"
-              className="group flex items-center gap-2.5 sm:gap-3 md:gap-3.5 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+              className="group flex items-center gap-2 sm:gap-3 md:gap-3.5 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
               aria-label="Denver Christmas Lights Home"
             >
               {/* Scalable, Theme-Aware Vector SVG Logo */}
@@ -63,7 +61,7 @@ export default function Navbar() {
 
           {/* ── RIGHT SIDE: Get Free Quote + Call Button ── */}
           <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 h-full shrink-0">
-            {/* New Premium "Get Free Quote" CTA Button */}
+            {/* Premium "Get Free Quote" CTA Button */}
             <motion.a
               id="navbar-get-quote-btn"
               href="#quote"
@@ -109,7 +107,7 @@ export default function Navbar() {
               </span>
             </motion.a>
 
-            {/* Call Button */}
+            {/* Call Button (Hidden on mobile, visible on tablet & desktop) */}
             <motion.a
               id="navbar-call-btn"
               href="tel:7202967711"
@@ -119,7 +117,7 @@ export default function Navbar() {
                   "var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)",
               }}
               whileTap={{ scale: 0.97 }}
-              className="relative group flex items-center gap-1.5 sm:gap-2 md:gap-2.5 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-medium text-[11px] sm:text-xs md:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0"
+              className="hidden sm:flex relative group items-center gap-1.5 sm:gap-2 md:gap-2.5 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-medium text-[11px] sm:text-xs md:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0"
               style={{
                 background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
                 border: "1px solid rgba(255,255,255,0.15)",
