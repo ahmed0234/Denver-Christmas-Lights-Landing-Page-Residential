@@ -38,6 +38,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   Snowflake,
   Sparkle,
@@ -546,7 +547,8 @@ export default function ProcessSection() {
           />
           <motion.button
             type="button"
-            className="relative flex w-full max-w-md items-center justify-between gap-3 rounded-full bg-gradient-to-b from-[var(--color-gold-light,#f8e3ab)]/90 via-[var(--color-gold,#e8b873)]/70 to-[var(--color-gold-dark,#a9762f)]/90 p-[1.5px] shadow-[0_14px_34px_-10px_rgba(0,0,0,0.65)] sm:w-auto"
+            onClick={handleGetQuoteClick}
+            className="relative flex w-full max-w-md items-center justify-between gap-3 rounded-full bg-gradient-to-b from-[var(--color-gold-light,#f8e3ab)]/90 via-[var(--color-gold,#e8b873)]/70 to-[var(--color-gold-dark,#a9762f)]/90 p-[1.5px] shadow-[0_14px_34px_-10px_rgba(0,0,0,0.65)] sm:w-auto cursor-pointer"
             whileHover={{ y: -3 }}
             whileTap={{ y: 0, scale: 0.99 }}
             transition={{ duration: 0.3, ease: "easeOut" }}

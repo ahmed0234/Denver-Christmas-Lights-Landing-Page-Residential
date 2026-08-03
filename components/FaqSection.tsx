@@ -16,6 +16,7 @@
 
 import { useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "motion/react";
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   HelpCircle,
   Plus,
@@ -459,6 +460,7 @@ export default function FaqSection() {
             <div className="z-10 relative w-full md:w-auto shrink-0">
               <motion.a
                 href="#quote"
+                onClick={handleGetQuoteClick}
                 className="inline-flex items-center justify-center gap-2 sm:gap-2.5 rounded-full px-6 sm:px-8 py-3.5 text-xs sm:text-sm font-bold tracking-wider uppercase overflow-hidden w-full md:w-auto cursor-pointer shadow-lg transition-all duration-300"
                 style={{
                   background:

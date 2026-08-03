@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion, useInView } from "motion/react";
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   Sparkles,
   Sun,
@@ -20,14 +21,14 @@ import {
 const transformations = [
   {
     id: 1,
-    title: "Before / After",
+    title: "Full Property Lighting",
     icon: Sparkles,
     beforeImage: "/BeforeAfter/beforeandafter/before.webp",
     afterImage: "/BeforeAfter/beforeandafter/after.webp",
   },
   {
     id: 2,
-    title: "Day / Night",
+    title: "Professional Installation",
     icon: Sun,
     beforeImage: "/BeforeAfter/dayandnight/day.webp",
     afterImage: "/BeforeAfter/dayandnight/night.webp",
@@ -41,21 +42,21 @@ const transformations = [
   },
   {
     id: 4,
-    title: "Tree Lighting",
+    title: "Tree & Landscape Lighting",
     icon: TreePine,
-    beforeImage: "/BeforeAfter/treelightning/before.webp",
-    afterImage: "/BeforeAfter/treelightning/after.webp",
+    beforeImage: "/BeforeAfter/treelightning/before.jpg",
+    afterImage: "/BeforeAfter/treelightning/after.jpg",
   },
   {
     id: 5,
-    title: "Entryway Lighting",
+    title: "Entryway & Porch Lighting",
     icon: DoorOpen,
     beforeImage: "/BeforeAfter/entrywaylightning/before.webp",
     afterImage: "/BeforeAfter/entrywaylightning/after.webp",
   },
   {
     id: 6,
-    title: "Commercial Buildings",
+    title: "Custom Lighting Design",
     icon: Building2,
     beforeImage: "/BeforeAfter/commercialbuilding/before.webp",
     afterImage: "/BeforeAfter/commercialbuilding/after.webp",
@@ -319,7 +320,7 @@ function SectionEyebrow() {
         className="text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] uppercase whitespace-nowrap"
         style={{ color: "var(--accent)" }}
       >
-        ✦ Before &amp; After Transformations ✦
+        ✦ what's Included ✦
       </span>
       <div
         className="h-px w-12 sm:w-20"
@@ -384,12 +385,13 @@ function BottomCTA() {
       <motion.a
         href="#quote"
         id="before-after-cta-quote"
+        onClick={handleGetQuoteClick}
         whileHover={{
           scale: 1.04,
           boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn)`,
         }}
         whileTap={{ scale: 0.97 }}
-        className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm tracking-wide whitespace-nowrap w-full sm:w-auto justify-center flex-shrink-0 overflow-hidden"
+        className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm tracking-wide whitespace-nowrap w-full sm:w-auto justify-center flex-shrink-0 overflow-hidden cursor-pointer"
         style={{
           background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
           boxShadow: `var(--shadow-btn), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
@@ -404,8 +406,8 @@ function BottomCTA() {
               "linear-gradient(180deg, var(--btn-inner-highlight) 0%, transparent 100%)",
           }}
         />
-        <span className="relative">Get Your Free Quote</span>
-        <ArrowRight size={15} className="relative" />
+        <span className="relative text-amber-950 font-semibold">Get Your Free Quote</span>
+        <ArrowRight size={15} className="relative text-amber-950 font-bold" />
       </motion.a>
     </motion.div>
   );

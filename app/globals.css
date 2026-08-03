@@ -751,3 +751,27 @@ html {
   );
   box-shadow: var(--shadow-card), inset 0 1px 0 var(--highlight-card);
 }
+
+/* ── CTA Button Shine Sweep Keyframes ────────────────────────────────────── */
+@keyframes btn-shine-sweep {
+  0% { transform: translateX(-150%) skewX(-25deg); }
+  100% { transform: translateX(250%) skewX(-25deg); }
+}
+
+.btn-shine-sweep-effect {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.group:hover .btn-shine-sweep-effect {
+  animation: btn-shine-sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

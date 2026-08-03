@@ -12,6 +12,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "motion/react";
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   MapPin,
   Sparkle,
@@ -269,8 +270,9 @@ function CTACard() {
       {/* Bottom Section — CTA Button */}
       <div className="relative z-10 pb-1 sm:pb-2 w-full flex justify-center">
         <motion.a
-          href="#contact"
-          className="inline-flex items-center justify-center gap-2 sm:gap-2.5 rounded-full px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-wide overflow-hidden w-full max-w-[12rem] sm:max-w-[13rem]"
+          href="#quote"
+          onClick={handleGetQuoteClick}
+          className="inline-flex items-center justify-center gap-2 sm:gap-2.5 rounded-full px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-wide overflow-hidden w-full max-w-[12rem] sm:max-w-[13rem] cursor-pointer"
           style={{
             background:
               "linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 50%, var(--gradient-btn-bottom) 100%)",

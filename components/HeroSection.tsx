@@ -110,6 +110,8 @@ const HERO_BOKEH = [
   { left: "74%", top: "92%", size: 4, gold: false, dur: 3.3, delay: 0.7 },
 ];
 
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
+
 // ── Main HeroSection ───────────────────────────────────────────────────────────
 export default function HeroSection() {
   const trustBadges = [
@@ -282,7 +284,7 @@ export default function HeroSection() {
               className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight font-sans"
               style={{ color: "var(--text-heading)" }}
             >
-              For Denver Homes
+              For Colorado Homes
             </motion.h1>
 
             {/* Divider */}
@@ -328,12 +330,13 @@ export default function HeroSection() {
               <motion.a
                 id="hero-cta-quote"
                 href="#quote"
+                onClick={handleGetQuoteClick}
                 whileHover={{
                   backgroundColor: "var(--accent-glow-soft)",
                   boxShadow: "0 4px 20px var(--accent-glow-soft)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide border"
+                className="flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide border cursor-pointer"
                 style={{
                   borderColor: "var(--accent)",
                   backgroundColor: "var(--accent-glow-faint)",
@@ -348,7 +351,7 @@ export default function HeroSection() {
               {/* Primary — Call */}
               <motion.a
                 id="hero-cta-call"
-                href="tel:+17205134567"
+                href="tel:7202967711"
                 whileHover={{
                   scale: 1.04,
                   boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
@@ -369,8 +372,8 @@ export default function HeroSection() {
                       "linear-gradient(180deg, var(--btn-inner-highlight) 0%, transparent 100%)",
                   }}
                 />
-                <Phone size={16} className="relative" />
-                <span className="relative ">Call (720) 513-4567</span>
+                <Phone size={16} className="relative text-amber-950" />
+                <span className="relative text-amber-950">Call (720) 296-7711</span>
               </motion.a>
 
               {/* Secondary — Get Quote */}
