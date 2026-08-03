@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
   User,
@@ -12,6 +13,9 @@ import {
   Lock,
   Snowflake,
   Check,
+  Phone,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 // ── Field wrapper ──────────────────────────────────────────────────────────────
@@ -23,6 +27,9 @@ function FormField({
   rightIcon: RightIcon,
   id,
   label,
+  value,
+  onChange,
+  required = false,
 }: {
   icon: React.ElementType;
   placeholder: string;
@@ -31,6 +38,9 @@ function FormField({
   rightIcon?: React.ElementType;
   id: string;
   label?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  required?: boolean;
 }) {
   const baseClass =
     "w-full bg-transparent text-[var(--text-body)] placeholder-[var(--text-muted)] text-sm outline-none resize-none leading-normal";
@@ -42,7 +52,7 @@ function FormField({
           htmlFor={id}
           className="text-xs font-semibold text-[var(--text-heading)] pl-0.5 tracking-wide"
         >
-          {label}
+          {label} {required && <span className="text-amber-400">*</span>}
         </label>
       )}
       <div
@@ -78,6 +88,9 @@ function FormField({
             id={id}
             placeholder={placeholder}
             rows={3}
+            value={value}
+            onChange={onChange}
+            required={required}
             className={`${baseClass} flex-1`}
           />
         ) : (
@@ -85,6 +98,9 @@ function FormField({
             id={id}
             type={type}
             placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            required={required}
             className={`${baseClass} flex-1`}
           />
         )}
@@ -103,7 +119,7 @@ function FormField({
 // ── Divider with snowflake ─────────────────────────────────────────────────────
 function SnowflakeDivider() {
   return (
-    <div className="flex items-center gap-3 my-5">
+    <div className="flex items-center gap-3 my-4">
       <div
         className="flex-1 h-px"
         style={{
@@ -132,9 +148,13 @@ const SERVICE_OPTIONS = [
   "Not Sure Yet",
 ];
 
-function ServiceMultiSelect() {
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-
+function ServiceMultiSelect({
+  selectedServices,
+  setSelectedServices,
+}: {
+  selectedServices: string[];
+  setSelectedServices: (services: string[]) => void;
+}) {
   const toggleService = (option: string) => {
     if (option === "Not Sure Yet") {
       if (selectedServices.includes("Not Sure Yet")) {
@@ -164,13 +184,6 @@ function ServiceMultiSelect() {
           Select all that apply
         </span>
       </div>
-
-      <input
-        type="hidden"
-        id="quote-services"
-        name="services"
-        value={selectedServices.join(", ")}
-      />
 
       <div className="flex flex-wrap gap-2 pt-0.5">
         {SERVICE_OPTIONS.map((option) => {
@@ -214,6 +227,19 @@ function ServiceMultiSelect() {
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function QuoteForm() {
+  const router = useRouter();
+
+  // Form State
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [zip, setZip] = useState("");
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [message, setMessage] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+
+  // Status & Attention States
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isHighlighting, setIsHighlighting] = useState(false);
   const [animKey, setAnimKey] = useState(0);
 
@@ -262,6 +288,60 @@ export default function QuoteForm() {
       );
     };
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    // Basic Client Validation
+    if (!name.trim()) {
+      setErrorMessage("Please enter your full name.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email.trim())) {
+      setErrorMessage("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        name: name.trim(),
+        email: email.trim(),
+        zip: zip.trim(),
+        services: selectedServices.join(", "),
+        message: message.trim(),
+        honeypot,
+      };
+
+      // Try production deployment API first, fallback to relative API route
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Redirect to success page
+        router.push("/success");
+      } else {
+        setErrorMessage(
+          result.error || "Something went wrong sending your inquiry. Please try again or call us directly."
+        );
+        setIsSubmitting(false);
+      }
+    } catch (err) {
+      console.error("QuoteForm submit error:", err);
+      setErrorMessage("Network error occurred. Please try again or call us at (720) 296-7711.");
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <motion.div
@@ -318,7 +398,6 @@ export default function QuoteForm() {
         }}
         className="relative z-10 rounded-2xl overflow-hidden"
         style={{
-          /* Deep vertical gradient — lighter top, darker bottom */
           background: `radial-gradient(ellipse 90% 45% at 50% 0%, var(--gradient-form-top) 0%, var(--gradient-form-mid) 38%, var(--gradient-form-bottom) 100%)`,
           border: `2px solid var(--form-border-color)`,
           boxShadow: `0 0 0 1px var(--border-color), var(--shadow-card-hover), inset 0 1px 0 var(--highlight-btn)`,
@@ -337,7 +416,7 @@ export default function QuoteForm() {
             }}
           />
         )}
-        {/* Top warm shimmer — creates the "lighter top" depth effect */}
+        {/* Top warm shimmer */}
         <div
           className="absolute top-0 left-0 right-0 h-28 pointer-events-none"
           style={{
@@ -354,10 +433,10 @@ export default function QuoteForm() {
         />
 
         {/* Content */}
-        <div className="relative px-7 pt-24 pb-7">
+        <div className="relative px-6 sm:px-7 pt-24 pb-7">
           {/* Top label */}
           <p
-            className="text-[11px] font-bold tracking-[0.25em] uppercase text-center mb-2"
+            className="text-[11px] font-bold tracking-[0.25em] uppercase text-center mb-1.5"
             style={{ color: "var(--accent)" }}
           >
             GET YOUR FREE
@@ -365,7 +444,7 @@ export default function QuoteForm() {
 
           {/* Heading */}
           <h2
-            className="text-[1.75rem] font-bold text-center leading-snug"
+            className="text-[1.65rem] sm:text-[1.75rem] font-bold text-center leading-snug"
             style={{
               color: "var(--text-heading)",
               textShadow: "0 2px 16px rgba(0,0,0,0.6)",
@@ -376,41 +455,89 @@ export default function QuoteForm() {
 
           <SnowflakeDivider />
 
+          {/* Error Banner */}
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-xl bg-red-950/70 border border-red-500/50 flex items-start gap-2.5 text-xs text-red-200"
+            >
+              <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{errorMessage}</span>
+            </motion.div>
+          )}
+
           {/* Form fields */}
-          <form
-            className="flex flex-col gap-4 2xl:gap-4"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <FormField id="quote-name" icon={User} placeholder="Full Name" />
+          <form className="flex flex-col gap-3.5" onSubmit={handleSubmit}>
+            {/* Honeypot field for anti-spam */}
+            <input
+              type="text"
+              name="honeypot"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              className="hidden"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+
+            <FormField
+              id="quote-name"
+              icon={User}
+              placeholder="Full Name *"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+
             <FormField
               id="quote-email"
               icon={Mail}
-              placeholder="Email Address"
+              placeholder="Email Address *"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
+
             <FormField
               id="quote-zip"
               icon={MapPin}
               placeholder="Enter your ZIP Code"
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
             />
-            <ServiceMultiSelect />
+
+            <ServiceMultiSelect
+              selectedServices={selectedServices}
+              setSelectedServices={setSelectedServices}
+            />
+
             <FormField
               id="quote-message"
               icon={MessageSquare}
-              placeholder="Message"
+              placeholder="Tell us about your home / preferences..."
               isTextarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
 
             {/* ── Submit Button ── */}
             <motion.button
               id="quote-submit"
               type="submit"
-              whileHover={{
-                scale: 1.02,
-                boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
-              }}
-              whileTap={{ scale: 0.98 }}
-              className="relative w-full mt-2 py-3 px-2 rounded-xl font-bold text-sm tracking-[0.16em] uppercase text-white flex items-center justify-center overflow-hidden"
+              disabled={isSubmitting}
+              whileHover={
+                isSubmitting
+                  ? {}
+                  : {
+                      scale: 1.02,
+                      boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
+                    }
+              }
+              whileTap={isSubmitting ? {} : { scale: 0.98 }}
+              className={`relative w-full mt-2 py-3.5 px-2 rounded-xl font-bold text-xs sm:text-sm tracking-[0.16em] uppercase flex items-center justify-center overflow-hidden cursor-pointer ${
+                isSubmitting ? "opacity-75 cursor-not-allowed" : ""
+              }`}
               style={{
                 background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
                 boxShadow: `var(--shadow-btn), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 0 var(--btn-inner-shadow)`,
@@ -424,15 +551,34 @@ export default function QuoteForm() {
                   background: `linear-gradient(180deg, var(--btn-inner-highlight) 0%, transparent 100%)`,
                 }}
               />
-              <span className="relative flex-1 text-center text-amber-950">GET A FREE QUOTE</span>
+              <span className="relative flex-1 text-center text-amber-950 font-extrabold flex items-center justify-center gap-2">
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-amber-950" />
+                    <span>SENDING REQUEST...</span>
+                  </>
+                ) : (
+                  <span>GET A FREE QUOTE</span>
+                )}
+              </span>
+
               <span
-                className="relative ml-4 w-9 h-9 rounded-full bg-white/15 border border-white/25 flex items-center justify-center shrink-0"
+                className="relative ml-2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 border border-white/25 flex items-center justify-center shrink-0"
                 style={{
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5)",
+                  boxShadow:
+                    "0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5)",
                   background: "rgba(255,255,255,0.18)",
                 }}
               >
-                <ArrowRight size={17} style={{ color: "#000", strokeWidth: 2.5 }} className="text-amber-950" />
+                {isSubmitting ? (
+                  <Loader2 size={15} className="animate-spin text-amber-950" />
+                ) : (
+                  <ArrowRight
+                    size={17}
+                    style={{ color: "#000", strokeWidth: 2.5 }}
+                    className="text-amber-950"
+                  />
+                )}
               </span>
             </motion.button>
           </form>

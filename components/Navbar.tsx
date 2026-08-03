@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "motion/react";
 import { Phone, Sparkles } from "lucide-react";
 import { ThemeLogoIcon } from "@/components/ThemeLogo";
@@ -34,8 +35,8 @@ export default function Navbar() {
 
           {/* ── LEFT SIDE: Logo + Text ── */}
           <div className="flex items-center h-full shrink-0">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="group flex items-center gap-2 sm:gap-3 md:gap-3.5 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
               aria-label="Denver Christmas Lights Home"
             >
@@ -56,7 +57,7 @@ export default function Navbar() {
                   CHRISTMAS LIGHTS
                 </span>
               </div>
-            </a>
+            </Link>
           </div>
 
           {/* ── RIGHT SIDE: Get Free Quote + Call Button ── */}

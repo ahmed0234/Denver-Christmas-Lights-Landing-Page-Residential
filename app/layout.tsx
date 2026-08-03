@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     "Residential Christmas Light Installation Denver | Denver Christmas Lights",
   description:
     "Professional residential Christmas light installation in Denver. Custom design, installation, maintenance, takedown and seasonal support. Request your free quote.",
+  icons: {
+    icon: "/NavbarLogo.png",
+    shortcut: "/NavbarLogo.png",
+    apple: "/NavbarLogo.png",
+  },
 };
 
 export default function RootLayout({
