@@ -111,6 +111,7 @@ const HERO_BOKEH = [
 ];
 
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
+import { handlePhoneCallClick } from "@/lib/gtag";
 
 // ── Main HeroSection ───────────────────────────────────────────────────────────
 export default function HeroSection() {
@@ -352,6 +353,7 @@ export default function HeroSection() {
               <motion.a
                 id="hero-cta-call"
                 href="tel:7202967711"
+                onClick={handlePhoneCallClick}
                 whileHover={{
                   scale: 1.04,
                   boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,

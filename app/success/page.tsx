@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { CheckCircle2, Phone, ArrowLeft, Sparkles, Snowflake, Calendar, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { handlePhoneCallClick } from "@/lib/gtag";
 
 export default function SuccessPage() {
   return (
@@ -144,6 +145,7 @@ export default function SuccessPage() {
 
           <a
             href="tel:7202967711"
+            onClick={handlePhoneCallClick}
             className="relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase overflow-hidden cursor-pointer shadow-lg transition-all"
             style={{
               background: `linear-gradient(180deg, #FFF4CE 0%, #F5C86A 32%, #E5A932 70%, #B87B15 100%)`,

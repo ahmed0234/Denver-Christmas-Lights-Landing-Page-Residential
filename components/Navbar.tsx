@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Phone, Sparkles } from "lucide-react";
 import { ThemeLogoIcon } from "@/components/ThemeLogo";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
+import { handlePhoneCallClick } from "@/lib/gtag";
 
 export default function Navbar() {
   return (
@@ -112,6 +113,7 @@ export default function Navbar() {
             <motion.a
               id="navbar-call-btn"
               href="tel:7202967711"
+              onClick={handlePhoneCallClick}
               whileHover={{
                 scale: 1.03,
                 boxShadow:

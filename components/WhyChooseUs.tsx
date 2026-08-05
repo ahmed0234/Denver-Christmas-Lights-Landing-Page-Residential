@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "motion/react";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
+import { handlePhoneCallClick } from "@/lib/gtag";
 import {
   ShieldCheck,
   Award,
@@ -748,6 +749,7 @@ export default function WhyChooseUs() {
                     href="tel:7202967711"
                     className="flex items-center gap-3 group"
                     id="why-cta-call"
+                    onClick={handlePhoneCallClick}
                   >
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-md"
