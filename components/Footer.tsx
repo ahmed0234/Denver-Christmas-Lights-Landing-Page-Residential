@@ -12,7 +12,6 @@ import { Mail, MapPin, Phone, Sparkles } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa6";
 import { ThemeLogoIcon } from "@/components/ThemeLogo";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
-import { handlePhoneCallClick } from "@/lib/gtag";
 
 const SOCIAL_LINKS = [
   {
@@ -200,7 +199,6 @@ export default function Footer() {
               <motion.a
                 id="footer-call-now-btn"
                 href="tel:7202967711"
-                onClick={handlePhoneCallClick}
                 whileHover={{
                   scale: 1.03,
                   y: -1.5,
