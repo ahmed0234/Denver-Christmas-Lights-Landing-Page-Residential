@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
-import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,26 +46,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
       <head>
-<<<<<<< HEAD
         {/* Google Tag (gtag.js) */}
         <Script
           strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=AW-959322441"
         />
         <Script id="google-gtag-init" strategy="afterInteractive">
-=======
-        {/* Google Tag Manager - gtag.js */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-959322441"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
->>>>>>> 46caba3791fb4adca0b579f70ff77c6c8e5f4d4b
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-<<<<<<< HEAD
 
             gtag('config', 'AW-959322441');
           `}
@@ -98,11 +87,6 @@ export default function RootLayout({
             }
           `}
         </Script>
-=======
-            gtag('config', 'AW-959322441');
-          `}
-        </Script>
->>>>>>> 46caba3791fb4adca0b579f70ff77c6c8e5f4d4b
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>{children}</ThemeProvider>
@@ -110,4 +94,3 @@ export default function RootLayout({
     </html>
   );
 }
-
