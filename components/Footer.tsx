@@ -6,12 +6,12 @@
  * Fully responsive, accessible, and high-converting.
  */
 
-import Link from "next/link";
-import { motion } from "motion/react";
-import { Mail, MapPin, Phone, Sparkles } from "lucide-react";
-import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa6";
 import { ThemeLogoIcon } from "@/components/ThemeLogo";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
+import { Mail, MapPin, Phone, Sparkles } from "lucide-react";
+import { motion } from "motion/react";
+import Link from "next/link";
+import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa6";
 
 const SOCIAL_LINKS = [
   {
@@ -33,7 +33,6 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-
 
   return (
     <footer
@@ -88,8 +87,8 @@ export default function Footer() {
               className="text-xs sm:text-sm leading-relaxed"
               style={{ color: "var(--text-muted)" }}
             >
-              Professional residential Christmas light installation, maintenance,
-              and takedown services in Denver, Colorado.
+              Professional residential Christmas light installation,
+              maintenance, and takedown services in Denver, Colorado.
             </p>
 
             {/* Social Media Icons */}
@@ -243,12 +242,12 @@ export default function Footer() {
             className="flex items-center gap-6"
             style={{ color: "var(--text-muted)" }}
           >
-            <a
-              href="#privacy"
+            <Link
+              href="/privacy-policy"
               className="hover:text-[var(--gold)] transition-colors focus:outline-none focus-visible:underline"
             >
               Privacy Policy
-            </a>
+            </Link>
             <span className="opacity-30">•</span>
             <a
               href="#terms"
