@@ -148,6 +148,10 @@ function BeforeAfterSlider({
       <img
         src={afterImage}
         alt={afterAlt}
+        loading="lazy"
+        decoding="async"
+        width={800}
+        height={500}
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
       />
@@ -159,6 +163,10 @@ function BeforeAfterSlider({
         <img
           src={beforeImage}
           alt={beforeAlt}
+          loading="lazy"
+          decoding="async"
+          width={800}
+          height={500}
           className="absolute inset-0 h-full object-cover"
           style={{
             width: `${10000 / Math.max(sliderPos, 0.1)}%`,
@@ -781,15 +789,15 @@ export default function Services() {
         }}
       />
 
-      {/* Bokeh */}
+      {/* Bokeh (GPU CSS keyframe powered — 0 JS execution) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
       >
         {SERVICE_BOKEH.map((b, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-bokeh"
             style={{
               left: b.left,
               top: b.top,
@@ -797,13 +805,8 @@ export default function Services() {
               height: b.size,
               backgroundColor: b.gold ? "var(--gold)" : "var(--accent)",
               filter: "blur(2px)",
-            }}
-            animate={{ opacity: [0.07, 0.38, 0.07], scale: [1, 1.5, 1] }}
-            transition={{
-              duration: b.dur,
-              repeat: Infinity,
-              delay: b.delay,
-              ease: "easeInOut",
+              ["--bokeh-dur" as string]: `${b.dur}s`,
+              ["--bokeh-delay" as string]: `${b.delay}s`,
             }}
           />
         ))}

@@ -377,14 +377,15 @@ export default function WhyChooseUs() {
       />
 
       {/* Bokeh */}
+      {/* Bokeh (GPU CSS keyframe powered — 0 JS execution) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden z-0"
         aria-hidden="true"
       >
         {BOKEH.map((b, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-bokeh"
             style={{
               left: b.left,
               top: b.top,
@@ -392,40 +393,30 @@ export default function WhyChooseUs() {
               height: b.size,
               backgroundColor: "var(--accent)",
               filter: "blur(2.5px)",
-            }}
-            animate={{ opacity: [0.06, 0.38, 0.06], scale: [1, 1.6, 1] }}
-            transition={{
-              duration: b.dur,
-              repeat: Infinity,
-              delay: b.delay,
-              ease: "easeInOut",
+              ["--bokeh-dur" as string]: `${b.dur}s`,
+              ["--bokeh-delay" as string]: `${b.delay}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Snow */}
+      {/* Snow (GPU CSS keyframe powered — 0 JS execution) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden z-0 hidden sm:block"
         aria-hidden="true"
       >
         {SNOW.map((s, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-snow"
             style={{
               left: s.left,
               top: s.top,
               width: s.size,
               height: s.size,
               backgroundColor: "rgba(255,255,255,0.55)",
-            }}
-            animate={{ opacity: [0, 0.55, 0], y: [0, 18, 36] }}
-            transition={{
-              duration: s.dur,
-              repeat: Infinity,
-              delay: s.delay,
-              ease: "easeInOut",
+              ["--snow-dur" as string]: `${s.dur}s`,
+              ["--snow-delay" as string]: `${s.delay}s`,
             }}
           />
         ))}

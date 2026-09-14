@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "motion/react";
 import {
   TreePine,
   Phone,
@@ -13,6 +12,7 @@ import {
   Snowflake,
 } from "lucide-react";
 import QuoteForm from "./QuoteForm";
+import { handleGetQuoteClick } from "@/lib/scrollUtils";
 
 // ── Snowflake + thin divider ───────────────────────────────────────────────────
 function HeadingDivider() {
@@ -48,22 +48,22 @@ function TrustBadge({
   icon: Icon,
   title,
   description,
-  delay,
+  staggerIndex,
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
-  delay: number;
+  staggerIndex: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="flex flex-col items-center text-center gap-2 px-3"
+    <div
+      className="flex flex-col items-center text-center gap-2 px-3 animate-hero-badges"
+      style={{
+        animationDelay: `${0.72 + staggerIndex * 0.08}s`,
+      }}
     >
       <div
-        className="w-11 h-11 rounded-full flex items-center justify-center"
+        className="w-11 h-11 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110"
         style={{
           background: `linear-gradient(135deg, var(--accent-glow-soft) 0%, var(--bg-elevated) 100%)`,
           border: "1px solid var(--border-color)",
@@ -90,7 +90,7 @@ function TrustBadge({
       >
         {description}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -109,8 +109,6 @@ const HERO_BOKEH = [
   { left: "18%", top: "35%", size: 3, gold: true, dur: 4.8, delay: 1.3 },
   { left: "74%", top: "92%", size: 4, gold: false, dur: 3.3, delay: 0.7 },
 ];
-
-import { handleGetQuoteClick } from "@/lib/scrollUtils";
 
 // ── Main HeroSection ───────────────────────────────────────────────────────────
 export default function HeroSection() {
@@ -143,15 +141,16 @@ export default function HeroSection() {
       className="relative min-h-screen w-full flex items-center overflow-hidden"
       style={{ background: "var(--bg-primary)" }}
     >
-      {/* ── Background Image ── */}
+      {/* ── Background Image (High Priority LCP Optimized) ── */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/HeroBackground.webp"
           alt="Beautiful Christmas-lit home at night"
           fill
           priority
+          sizes="100vw"
           className="object-cover object-center"
-          quality={95}
+          quality={80}
         />
         {/* Directional overlay */}
         <div
@@ -179,12 +178,12 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* ── Bokeh Particles ── */}
+      {/* ── Bokeh Particles (GPU CSS keyframe powered — 0 JS execution) ── */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
         {HERO_BOKEH.map((b, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-bokeh"
             style={{
               width: b.size,
               height: b.size,
@@ -192,13 +191,8 @@ export default function HeroSection() {
               top: b.top,
               backgroundColor: b.gold ? "var(--gold)" : "var(--accent)",
               filter: "blur(2px)",
-            }}
-            animate={{ opacity: [0.2, 0.7, 0.2], scale: [1, 1.4, 1] }}
-            transition={{
-              duration: b.dur,
-              repeat: Infinity,
-              delay: b.delay,
-              ease: "easeInOut",
+              ["--bokeh-dur" as string]: `${b.dur}s`,
+              ["--bokeh-delay" as string]: `${b.delay}s`,
             }}
           />
         ))}
@@ -210,12 +204,7 @@ export default function HeroSection() {
           {/* LEFT COLUMN */}
           <div className="w-full lg:max-w-[620px] xl:max-w-[960px] flex flex-col items-start lg:pt-6">
             {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="flex items-center gap-2 mb-5"
-            >
+            <div className="animate-hero-eyebrow flex items-center gap-2 mb-5">
               <TreePine size={22} style={{ color: "var(--accent)" }} />
               <span
                 className="text-xs font-semibold tracking-[0.22em] uppercase"
@@ -223,34 +212,18 @@ export default function HeroSection() {
               >
                 Residential Christmas Light Installation in Denver Colorado
               </span>
-            </motion.div>
+            </div>
 
             {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.75,
-                delay: 0.2,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight mb-1 font-sans"
+            <h1
+              className="animate-hero-heading-1 text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight mb-1 font-sans"
               style={{ color: "var(--text-heading)" }}
             >
               Professional Christmas
-            </motion.h1>
+            </h1>
 
             {/* "the Brightest" */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.75,
-                delay: 0.28,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="relative inline-block mb-1"
-            >
+            <div className="animate-hero-heading-highlight relative inline-block mb-1">
               <span className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight italic font-playfair text-accent-gradient">
                 Light Installation
               </span>
@@ -260,83 +233,53 @@ export default function HeroSection() {
                 className="absolute -bottom-2 left-0 w-full"
                 preserveAspectRatio="none"
               >
-                <motion.path
+                <path
                   d="M4 10 C40 2, 80 18, 120 10 C160 2, 200 18, 240 10 C280 2, 316 15, 316 10"
                   stroke="var(--accent)"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
+                  className="animate-hero-underline"
                 />
               </svg>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.75,
-                delay: 0.36,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight font-sans"
+            <h1
+              className="animate-hero-heading-2 text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight font-sans"
               style={{ color: "var(--text-heading)" }}
             >
               For Colorado Homes
-            </motion.h1>
+            </h1>
 
             {/* Divider */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.55 }}
-              className="w-full"
-            >
+            <div className="animate-hero-divider w-full">
               <HeadingDivider />
-            </motion.div>
+            </div>
 
             {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-base md:text-lg leading-normal max-w-[440px] xl:max-w-[560px] mb-2 2xl:text-xl"
+            <p
+              className="animate-hero-desc text-base md:text-lg leading-normal max-w-[440px] xl:max-w-[560px] mb-2 2xl:text-xl"
               style={{ color: "var(--text-body)" }}
             >
               Make your home stand out this holiday season without climbing
               ladders, untangling wires or spending your weekend in the cold
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-base md:text-lg leading-normal max-w-[440px] xl:max-w-[560px] mb-2 2xl:text-xl"
+            </p>
+            <p
+              className="animate-hero-desc text-base md:text-lg leading-normal max-w-[440px] xl:max-w-[560px] mb-2 2xl:text-xl"
               style={{ color: "var(--text-body)" }}
             >
               Denver Christmas Lights handles the complete process, including
               custom design, professional installation, in season maintenance
               and post holiday removal
-            </motion.p>
+            </p>
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.62 }}
-              className="flex flex-wrap gap-4 mb-8"
-            >
-              <motion.a
+            <div className="animate-hero-ctas flex flex-wrap gap-4 mb-8">
+              <a
                 id="hero-cta-quote"
                 href="#quote"
                 onClick={handleGetQuoteClick}
-                whileHover={{
-                  backgroundColor: "var(--accent-glow-soft)",
-                  boxShadow: "0 4px 20px var(--accent-glow-soft)",
-                }}
-                whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide border cursor-pointer"
+                className="flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide border cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_4px_20px_var(--accent-glow-soft)] hover:bg-[var(--accent-glow-soft)] active:scale-[0.97]"
                 style={{
                   borderColor: "var(--accent)",
                   backgroundColor: "var(--accent-glow-faint)",
@@ -346,18 +289,13 @@ export default function HeroSection() {
               >
                 <CalendarCheck size={16} />
                 Get My Free Christmas Light Quote
-              </motion.a>
+              </a>
 
               {/* Primary — Call */}
-              <motion.a
+              <a
                 id="hero-cta-call"
                 href="tel:7202967711"
-                whileHover={{
-                  scale: 1.04,
-                  boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
-                }}
-                whileTap={{ scale: 0.97 }}
-                className="relative flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide overflow-hidden"
+                className="relative flex items-center gap-2.5 px-7 py-4 rounded-xl font-semibold text-sm tracking-wide overflow-hidden transition-all duration-200 hover:scale-[1.04] hover:shadow-[var(--shadow-btn-hover)] active:scale-[0.97]"
                 style={{
                   background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
                   boxShadow: `var(--shadow-btn), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
@@ -374,18 +312,11 @@ export default function HeroSection() {
                 />
                 <Phone size={16} className="relative text-amber-950" />
                 <span className="relative text-amber-950">Call (720) 296-7711</span>
-              </motion.a>
-
-              {/* Secondary — Get Quote */}
-            </motion.div>
+              </a>
+            </div>
 
             {/* Trust Badges */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.72 }}
-              className="w-full max-w-[760px]"
-            >
+            <div className="animate-hero-badges w-full max-w-[760px]">
               <div
                 className="grid grid-cols-2 md:grid-cols-4 rounded-xl overflow-hidden p-5 gap-y-4"
                 style={{
@@ -408,12 +339,12 @@ export default function HeroSection() {
                       icon={badge.icon}
                       title={badge.title}
                       description={badge.description}
-                      delay={0.72 + i * 0.08}
+                      staggerIndex={i}
                     />
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* RIGHT COLUMN — Form */}

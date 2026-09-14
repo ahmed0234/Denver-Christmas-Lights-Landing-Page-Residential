@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Geist, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
@@ -7,18 +7,15 @@ import { ThemeProvider } from "@/components/ThemeContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
+  weight: ["700"],
   style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -43,15 +40,15 @@ export default function RootLayout({
       lang="en"
       data-theme="golden"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <head>
-        {/* Google Tag (gtag.js) */}
+        {/* Google Tag (gtag.js) - Loaded during browser idle time for 0 TBT impact */}
         <Script
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=AW-959322441"
         />
-        <Script id="google-gtag-init" strategy="afterInteractive">
+        <Script id="google-gtag-init" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -61,7 +58,7 @@ export default function RootLayout({
           `}
         </Script>
         {/* Google Ads Phone Call Conversion Tracking Snippet */}
-        <Script id="google-phone-conversion" strategy="afterInteractive">
+        <Script id="google-phone-conversion" strategy="lazyOnload">
           {`
             gtag('config', 'AW-959322441/yn4TCPqn09wcEMmyuMkD', {
               'phone_conversion_number': '(720) 296-7711'
@@ -69,7 +66,7 @@ export default function RootLayout({
           `}
         </Script>
         {/* Google Ads Onclick Call Conversion Helper */}
-        <Script id="gtag-report-conversion" strategy="afterInteractive">
+        <Script id="gtag-report-conversion" strategy="lazyOnload">
           {`
             function gtag_report_conversion(url) {
               var callback = function () {

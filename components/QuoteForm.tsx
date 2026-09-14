@@ -344,31 +344,24 @@ export default function QuoteForm() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50, y: 10 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
-      className="relative w-full max-w-[480px] mx-auto"
-    >
+    <div className="animate-hero-form relative w-full max-w-[480px] mx-auto">
       {/* Christmas Lights decoration */}
       <div
         className="absolute z-20 pointer-events-none"
         style={{ top: "-76px", left: "-18px", right: "-18px" }}
       >
-        <motion.div
-          animate={{ opacity: [0.88, 1, 0.88] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
+        <div className="animate-lights-pulse">
           <Image
-            src="/FormUpperLights.png"
+            src="/FormUpperLights.webp"
             alt="Christmas string lights decoration"
-            width={1320}
-            height={540}
+            width={960}
+            height={392}
+            sizes="(max-width: 640px) 100vw, 480px"
             className="w-full h-auto"
             style={{ mixBlendMode: "screen" }}
             priority
           />
-        </motion.div>
+        </div>
       </div>
 
       {/* ── Card ─────────────────────────────────────────────────────────────── */}
@@ -592,6 +585,6 @@ export default function QuoteForm() {
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

@@ -44,8 +44,8 @@ const transformations = [
     id: 4,
     title: "Tree & Landscape Lighting",
     icon: TreePine,
-    beforeImage: "/BeforeAfter/treelightning/before.jpg",
-    afterImage: "/BeforeAfter/treelightning/after.jpg",
+    beforeImage: "/BeforeAfter/treelightning/before.webp",
+    afterImage: "/BeforeAfter/treelightning/after.webp",
   },
   {
     id: 5,
@@ -152,6 +152,10 @@ function BeforeAfterSlider({
       <img
         src={afterImage}
         alt={afterAlt}
+        loading="lazy"
+        decoding="async"
+        width={800}
+        height={600}
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
       />
@@ -163,6 +167,10 @@ function BeforeAfterSlider({
         <img
           src={beforeImage}
           alt={beforeAlt}
+          loading="lazy"
+          decoding="async"
+          width={800}
+          height={600}
           className="absolute inset-0 h-full object-cover"
           style={{
             width: `${10000 / Math.max(sliderPos, 0.1)}%`,
@@ -442,9 +450,10 @@ export default function BeforeandAfter() {
           src="/BeforeAfter/BackGroundSubtle.webp"
           alt=""
           fill
+          sizes="100vw"
           aria-hidden="true"
           className="object-cover object-[50%_30%] md:object-center opacity-65 md:opacity-90 brightness-90 saturate-90 contrast-105"
-          quality={95}
+          quality={75}
         />
         <div
           className="absolute inset-0"
@@ -478,15 +487,15 @@ export default function BeforeandAfter() {
         }}
       />
 
-      {/* Bokeh */}
+      {/* Bokeh (GPU CSS keyframe powered — 0 JS execution) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
       >
         {BOKEH.map((b, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-bokeh"
             style={{
               left: b.left,
               top: b.top,
@@ -494,13 +503,8 @@ export default function BeforeandAfter() {
               height: b.size,
               backgroundColor: b.gold ? "var(--gold)" : "var(--accent)",
               filter: "blur(2px)",
-            }}
-            animate={{ opacity: [0.12, 0.5, 0.12], scale: [1, 1.5, 1] }}
-            transition={{
-              duration: b.dur,
-              repeat: Infinity,
-              delay: b.delay,
-              ease: "easeInOut",
+              ["--bokeh-dur" as string]: `${b.dur}s`,
+              ["--bokeh-delay" as string]: `${b.delay}s`,
             }}
           />
         ))}

@@ -1,15 +1,18 @@
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import BeforeandAfter from "@/components/BeforeandAfter";
 import Services from "@/components/Services";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Process from "@/components/Process";
-import AreasServices from "@/components/AreasServices";
-import Reviews from "@/components/Reviews";
-import Faq from "@/components/Faq";
-import FinalCTA from "@/components/FinalCTA";
-import Footer from "@/components/Footer";
-import FloatingCTA from "@/components/FloatingCTA";
+
+// Below-the-fold components loaded progressively to preserve critical render path
+const AreasServices = dynamic(() => import("@/components/AreasServices"));
+const Process = dynamic(() => import("@/components/Process"));
+const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
+const Reviews = dynamic(() => import("@/components/Reviews"));
+const Faq = dynamic(() => import("@/components/Faq"));
+const FinalCTA = dynamic(() => import("@/components/FinalCTA"));
+const Footer = dynamic(() => import("@/components/Footer"));
+const FloatingCTA = dynamic(() => import("@/components/FloatingCTA"));
 
 const page = () => {
   return (
