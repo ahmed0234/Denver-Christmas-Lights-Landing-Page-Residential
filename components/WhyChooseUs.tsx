@@ -460,8 +460,8 @@ export default function WhyChooseUs() {
                   alt="Professionally decorated Christmas home at night"
                   fill
                   className="object-cover object-[80%_center] lg:object-center brightness-[1.22] contrast-[1.1] sm:brightness-110 sm:contrast-105 scale-105 transition-transform duration-700"
-                  quality={95}
-                  priority
+                  quality={75}
+                  loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 48vw"
                 />
                 <div
@@ -630,7 +630,8 @@ export default function WhyChooseUs() {
                     alt="Beautifully decorated Christmas home"
                     fill
                     className="object-cover object-[75%_center] lg:object-right-center brightness-[1.06] scale-[1] transition-transform duration-700"
-                    quality={95}
+                    quality={75}
+                    loading="lazy"
                     sizes="(max-width: 1024px) 100vw, 55vw"
                   />
                   <div

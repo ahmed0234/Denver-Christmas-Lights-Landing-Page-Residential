@@ -216,39 +216,35 @@ export default function HeroSection() {
 
             {/* Main Heading */}
             <h1
-              className="animate-hero-heading-1 text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight mb-1 font-sans"
+              className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight mb-1 font-sans"
               style={{ color: "var(--text-heading)" }}
             >
-              Professional Christmas
-            </h1>
-
-            {/* "the Brightest" */}
-            <div className="animate-hero-heading-highlight relative inline-block mb-1">
-              <span className="text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight italic font-playfair text-accent-gradient">
-                Light Installation
+              <span className="animate-hero-heading-1 block">
+                Professional Christmas
               </span>
-              <svg
-                viewBox="0 0 320 18"
-                fill="none"
-                className="absolute -bottom-2 left-0 w-full"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M4 10 C40 2, 80 18, 120 10 C160 2, 200 18, 240 10 C280 2, 316 15, 316 10"
-                  stroke="var(--accent)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
+              <span className="animate-hero-heading-highlight relative inline-block my-1">
+                <span className="italic font-playfair text-accent-gradient">
+                  Light Installation
+                </span>
+                <svg
+                  viewBox="0 0 320 18"
                   fill="none"
-                  className="animate-hero-underline"
-                />
-              </svg>
-            </div>
-
-            <h1
-              className="animate-hero-heading-2 text-5xl md:text-6xl xl:text-7xl 2xl:text-7xl font-bold leading-[1] tracking-tight font-sans"
-              style={{ color: "var(--text-heading)" }}
-            >
-              For Colorado Homes
+                  className="absolute -bottom-2 left-0 w-full"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M4 10 C40 2, 80 18, 120 10 C160 2, 200 18, 240 10 C280 2, 316 15, 316 10"
+                    stroke="var(--accent)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    className="animate-hero-underline"
+                  />
+                </svg>
+              </span>
+              <span className="animate-hero-heading-2 block">
+                For Colorado Homes
+              </span>
             </h1>
 
             {/* Divider */}

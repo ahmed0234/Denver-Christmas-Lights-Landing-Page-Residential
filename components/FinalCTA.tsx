@@ -550,9 +550,9 @@ export default function FinalCTA() {
                   src="/FinalCta/BackgroundImage.webp"
                   alt="Beautifully decorated Denver home with premium Christmas lights installed along the roofline and landscaping"
                   fill
-                  priority
+                  loading="lazy"
                   className="object-cover object-center saturate-110 contrast-105 brightness-105"
-                  quality={95}
+                  quality={75}
                   sizes="(max-width: 1024px) 100vw, 54vw"
                 />
               </motion.div>

@@ -62,8 +62,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Highlands Ranch, CO",
     rating: 5.0,
     text: "The team did an amazing job with our Christmas lights! The installation was flawless, and their attention to detail made our home the best on the block. Professional & on time!",
-    avatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-1.webp",
   },
   {
     id: 2,
@@ -71,8 +70,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Parker, CO",
     rating: 4.9,
     text: "Super reliable and great communication from start to finish. They showed up when they said they would, and our lights look absolutely stunning. Highly recommend!",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-2.webp",
   },
   {
     id: 3,
@@ -80,8 +78,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Greenwood Village, CO",
     rating: 4.8,
     text: "I love that they handle everything installation, maintenance, and takedown. When a bulb went out, they responded the same day. Beautiful work all season long!",
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-3.webp",
   },
   {
     id: 4,
@@ -89,8 +86,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Cherry Creek, Denver",
     rating: 5.0,
     text: "Top tier service! They customized the roofline lighting perfectly to fit our home's architecture. Takedown and storage in January was seamless. Worth every penny.",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-4.webp",
   },
   {
     id: 5,
@@ -98,8 +94,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Castle Pines, CO",
     rating: 4.9,
     text: "From initial design to final glowing lights, everything was handled with perfection. Our kids were thrilled, and neighbors kept complimenting the display!",
-    avatar:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-5.webp",
   },
   {
     id: 6,
@@ -107,8 +102,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Wash Park, Denver",
     rating: 4.8,
     text: "Prompt, safe, and professional installation. The warm gold glow on our roofline created a holiday atmosphere that exceeded all expectations.",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-6.webp",
   },
   {
     id: 7,
@@ -116,8 +110,7 @@ const REVIEWS: ReviewItem[] = [
     location: "Littleton, CO",
     rating: 4.9,
     text: "Extremely impressive attention to detail. No visible clips, straight lines, and hassle-free post-season removal. Will definitely use them every year!",
-    avatar:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=250&q=80",
+    avatar: "/ReviewTestimonial/avatar-7.webp",
   },
 ];
 
@@ -155,9 +148,9 @@ export default function ReviewsSection() {
           src="/ReviewTestimonial/ReviewsBackground.webp"
           alt=""
           fill
-          priority
+          loading="lazy"
           className="object-cover object-center lg:object-right opacity-85 sm:opacity-90 saturate-110 contrast-105 brightness-95"
-          quality={95}
+          quality={75}
         />
 
         {/* Lighter, Natural Radial Overlay so House & Lights Shine Brightly */}

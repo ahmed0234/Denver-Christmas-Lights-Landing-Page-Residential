@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 import { motion, useInView } from "motion/react";
 import {
   Snowflake,
@@ -144,34 +145,28 @@ function BeforeAfterSlider({
       tabIndex={0}
       onKeyDown={onKeyDown}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={afterImage}
         alt={afterAlt}
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
         loading="lazy"
-        decoding="async"
-        width={800}
-        height={500}
+        quality={75}
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
       />
       <div
-        className="absolute inset-0 overflow-hidden"
-        style={{ width: `${sliderPos}%` }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={beforeImage}
           alt={beforeAlt}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
           loading="lazy"
-          decoding="async"
-          width={800}
-          height={500}
-          className="absolute inset-0 h-full object-cover"
-          style={{
-            width: `${10000 / Math.max(sliderPos, 0.1)}%`,
-            maxWidth: "none",
-          }}
+          quality={75}
+          className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
         />
       </div>

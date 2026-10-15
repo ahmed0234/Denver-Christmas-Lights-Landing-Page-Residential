@@ -367,9 +367,9 @@ export default function AreasServices() {
           src="/AreaSection/MapImage.webp"
           alt=""
           fill
-          priority
+          loading="lazy"
           className="object-cover object-center lg:object-right opacity-80 sm:opacity-85 lg:opacity-90 saturate-110 contrast-105"
-          quality={90}
+          quality={75}
         />
 
         {/* Desktop Left-to-Right Edge Blend Gradient (melts smoothly from left text background) */}

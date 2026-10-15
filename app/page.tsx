@@ -1,18 +1,15 @@
-import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import BeforeandAfter from "@/components/BeforeandAfter";
 import Services from "@/components/Services";
-
-// Below-the-fold components loaded progressively to preserve critical render path
-const AreasServices = dynamic(() => import("@/components/AreasServices"));
-const Process = dynamic(() => import("@/components/Process"));
-const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
-const Reviews = dynamic(() => import("@/components/Reviews"));
-const Faq = dynamic(() => import("@/components/Faq"));
-const FinalCTA = dynamic(() => import("@/components/FinalCTA"));
-const Footer = dynamic(() => import("@/components/Footer"));
-const FloatingCTA = dynamic(() => import("@/components/FloatingCTA"));
+import AreasServices from "@/components/AreasServices";
+import Process from "@/components/Process";
+import WhyChooseUs from "@/components/WhyChooseUs";
+import ReviewsSection from "@/components/ReviewsSection";
+import FaqSection from "@/components/FaqSection";
+import FinalCTA from "@/components/FinalCTA";
+import Footer from "@/components/Footer";
+import FloatingCTA from "@/components/FloatingCTA";
 
 const page = () => {
   return (
@@ -24,8 +21,8 @@ const page = () => {
       <AreasServices />
       <Process />
       <WhyChooseUs />
-      <Reviews />
-      <Faq />
+      <ReviewsSection />
+      <FaqSection />
       <FinalCTA />
       <Footer />
       <FloatingCTA />
