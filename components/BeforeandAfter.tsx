@@ -2,7 +2,6 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   Sparkles,
@@ -76,70 +75,137 @@ function BeforeAfterSlider({
   afterAlt: string;
 }) {
   const [sliderPos, setSliderPos] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
+  const clipRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const rafId = useRef<number | null>(null);
+  const posRef = useRef(50);
 
-  const updateSlider = useCallback((clientX: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    setSliderPos(
-      (Math.max(0, Math.min(clientX - rect.left, rect.width)) / rect.width) *
-        100,
-    );
+  const applyPos = useCallback((pos: number) => {
+    posRef.current = pos;
+    if (clipRef.current) {
+      clipRef.current.style.clipPath = `inset(0 ${100 - pos}% 0 0)`;
+    }
+    if (lineRef.current) {
+      lineRef.current.style.left = `${pos}%`;
+    }
+    if (handleRef.current) {
+      handleRef.current.style.left = `${pos}%`;
+    }
+    if (containerRef.current) {
+      containerRef.current.setAttribute("aria-valuenow", String(Math.round(pos)));
+    }
   }, []);
 
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      isDragging.current = true;
-      updateSlider(e.clientX);
+  const updateFromClientX = useCallback(
+    (clientX: number) => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.width <= 0) return;
+        const rawPos = ((clientX - rect.left) / rect.width) * 100;
+        const clamped = Math.max(0, Math.min(100, rawPos));
+        applyPos(clamped);
+      });
     },
-    [updateSlider],
+    [applyPos]
   );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return;
+      isDraggingRef.current = true;
+      setIsDragging(true);
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Safe fallback
+      }
+      updateFromClientX(e.clientX);
+    },
+    [updateFromClientX]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      updateFromClientX(e.clientX);
+    },
+    [updateFromClientX]
+  );
+
+  const stopDragging = useCallback(
+    (e?: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      setSliderPos(posRef.current);
+      if (e) {
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          // Safe fallback
+        }
+      }
+    },
+    []
+  );
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      let step = 0;
+      if (e.key === "ArrowLeft") step = e.shiftKey ? -5 : -2;
+      else if (e.key === "ArrowRight") step = e.shiftKey ? 5 : 2;
+      else if (e.key === "PageDown") step = -10;
+      else if (e.key === "PageUp") step = 10;
+      else if (e.key === "Home") step = -100;
+      else if (e.key === "End") step = 100;
+
+      if (step !== 0) {
+        e.preventDefault();
+        const next = Math.max(0, Math.min(100, posRef.current + step));
+        applyPos(next);
+        setSliderPos(next);
+      }
+    },
+    [applyPos]
+  );
+
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (isDragging.current) updateSlider(e.clientX);
+    const handleGlobalPointerUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+        setSliderPos(posRef.current);
+      }
     };
-    const onMouseUp = () => {
-      isDragging.current = false;
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("pointerup", handleGlobalPointerUp);
+    window.addEventListener("pointercancel", handleGlobalPointerUp);
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("pointerup", handleGlobalPointerUp);
+      window.removeEventListener("pointercancel", handleGlobalPointerUp);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [updateSlider]);
-
-  const onTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      isDragging.current = true;
-      updateSlider(e.touches[0].clientX);
-    },
-    [updateSlider],
-  );
-  const onTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (isDragging.current) updateSlider(e.touches[0].clientX);
-    },
-    [updateSlider],
-  );
-  const onTouchEnd = useCallback(() => {
-    isDragging.current = false;
-  }, []);
-  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") setSliderPos((p) => Math.max(0, p - 2));
-    if (e.key === "ArrowRight") setSliderPos((p) => Math.min(100, p + 2));
   }, []);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full select-none overflow-hidden cursor-col-resize"
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      className={`relative w-full h-full select-none overflow-hidden ${
+        isDragging ? "cursor-grabbing" : "cursor-ew-resize"
+      }`}
+      style={{
+        touchAction: isDragging ? "none" : "pan-y",
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={stopDragging}
+      onPointerCancel={stopDragging}
       role="slider"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -154,13 +220,18 @@ function BeforeAfterSlider({
         fill
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         loading="lazy"
-        quality={75}
-        className="absolute inset-0 w-full h-full object-cover"
+        decoding="async"
+        quality={90}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
         draggable={false}
       />
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+        ref={clipRef}
+        className="absolute inset-0 pointer-events-none overflow-hidden select-none"
+        style={{
+          clipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
+          willChange: isDragging ? "clip-path" : "auto",
+        }}
       >
         <Image
           src={beforeImage}
@@ -168,30 +239,43 @@ function BeforeAfterSlider({
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           loading="lazy"
-          quality={75}
-          className="absolute inset-0 w-full h-full object-cover"
+          decoding="async"
+          quality={90}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           draggable={false}
         />
       </div>
       <div
-        className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
+        ref={lineRef}
+        className="absolute top-0 bottom-0 w-[2px] pointer-events-none z-10"
         style={{
           left: `${sliderPos}%`,
           transform: "translateX(-50%)",
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.88) 18%, rgba(255,255,255,0.88) 82%, rgba(255,255,255,0) 100%)",
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 15%, rgba(255,255,255,0.92) 85%, rgba(255,255,255,0) 100%)",
+          filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))",
+          willChange: isDragging ? "left" : "auto",
         }}
       />
       <div
-        className="absolute top-1/2 z-10 pointer-events-none"
-        style={{ left: `${sliderPos}%`, transform: "translate(-50%, -50%)" }}
+        ref={handleRef}
+        className="absolute top-1/2 z-20 pointer-events-none"
+        style={{
+          left: `${sliderPos}%`,
+          transform: "translate(-50%, -50%)",
+          willChange: isDragging ? "left" : "auto",
+        }}
       >
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center"
+          className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform duration-150 ${
+            isDragging ? "scale-110 shadow-lg" : "hover:scale-105"
+          }`}
           style={{
             background: "rgba(255,255,255,0.96)",
-            boxShadow:
-              "0 2px 16px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(255,255,255,0.35)",
+            boxShadow: isDragging
+              ? "0 4px 20px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.6)"
+              : "0 2px 16px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(255,255,255,0.35)",
+            backdropFilter: "blur(4px)",
           }}
         >
           <ChevronLeft
@@ -207,7 +291,7 @@ function BeforeAfterSlider({
         </div>
       </div>
       <div
-        className="absolute top-3 left-3 px-2.5 py-1 rounded text-xs font-semibold text-white tracking-wide pointer-events-none"
+        className="absolute top-3 left-3 px-2.5 py-1 rounded text-xs font-semibold text-white tracking-wide pointer-events-none z-10 select-none"
         style={{
           background: "rgba(10,8,8,0.72)",
           backdropFilter: "blur(6px)",
@@ -217,7 +301,7 @@ function BeforeAfterSlider({
         Before
       </div>
       <div
-        className="absolute top-3 right-3 px-2.5 py-1 rounded text-xs font-semibold text-white tracking-wide pointer-events-none"
+        className="absolute top-3 right-3 px-2.5 py-1 rounded text-xs font-semibold text-white tracking-wide pointer-events-none z-10 select-none"
         style={{
           background: "var(--accent)",
           boxShadow: "0 2px 8px var(--accent-glow-soft)",
@@ -232,7 +316,6 @@ function BeforeAfterSlider({
 // ─── Transformation Card ───────────────────────────────────────────────────────
 function TransformationCard({
   item,
-  index,
 }: {
   item: (typeof transformations)[0];
   index: number;
@@ -245,22 +328,13 @@ function TransformationCard({
   const hoverShadow = `inset 0 1px 0 var(--highlight-card), var(--shadow-card-hover)`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{
-        duration: 0.58,
-        delay: (index % 3) * 0.1,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -4, transition: { duration: 0.22, ease: "easeOut" } }}
-      className="group flex flex-col rounded-xl overflow-hidden"
+    <div
+      className="group flex flex-col rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
       style={{
         background: normalBg,
         border: "2px solid transparent",
         boxShadow: normalShadow,
-        transition: "background 0.35s ease, box-shadow 0.35s ease",
+        transition: "background 0.35s ease, box-shadow 0.35s ease, transform 0.25s ease",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement;
@@ -303,7 +377,7 @@ function TransformationCard({
           {item.title}
         </span>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -338,11 +412,7 @@ function SectionEyebrow() {
 // ─── Bottom CTA Bar ───────────────────────────────────────────────────────────
 function BottomCTA() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className="flex flex-col sm:flex-row items-center justify-between gap-6 px-7 py-6 rounded-2xl max-w-[1280px] mx-auto"
       style={{
         background: `linear-gradient(160deg, var(--gradient-card-top) 0%, var(--gradient-card-bottom) 100%) padding-box, var(--card-border-gradient) border-box`,
@@ -384,16 +454,11 @@ function BottomCTA() {
         </div>
       </div>
 
-      <motion.a
+      <a
         href="#quote"
         id="before-after-cta-quote"
         onClick={handleGetQuoteClick}
-        whileHover={{
-          scale: 1.04,
-          boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn)`,
-        }}
-        whileTap={{ scale: 0.97 }}
-        className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm tracking-wide whitespace-nowrap w-full sm:w-auto justify-center flex-shrink-0 overflow-hidden cursor-pointer"
+        className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm tracking-wide whitespace-nowrap w-full sm:w-auto justify-center flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
         style={{
           background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
           boxShadow: `var(--shadow-btn), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
@@ -410,8 +475,8 @@ function BottomCTA() {
         />
         <span className="relative text-amber-950 font-semibold">Get Your Free Quote</span>
         <ArrowRight size={15} className="relative text-amber-950 font-bold" />
-      </motion.a>
-    </motion.div>
+      </a>
+    </div>
   );
 }
 
@@ -428,12 +493,8 @@ const BOKEH = [
 
 // ─── Main Section ─────────────────────────────────────────────────────────────
 export default function BeforeandAfter() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
-
   return (
     <section
-      ref={sectionRef}
       id="before-after"
       className="relative w-full overflow-hidden"
       style={{ background: "var(--bg-primary)" }}
@@ -445,9 +506,11 @@ export default function BeforeandAfter() {
           alt=""
           fill
           sizes="100vw"
+          loading="lazy"
+          decoding="async"
           aria-hidden="true"
           className="object-cover object-[50%_30%] md:object-center opacity-65 md:opacity-90 brightness-90 saturate-90 contrast-105"
-          quality={75}
+          quality={82}
         />
         <div
           className="absolute inset-0"
@@ -481,7 +544,7 @@ export default function BeforeandAfter() {
         }}
       />
 
-      {/* Bokeh (GPU CSS keyframe powered — 0 JS execution) */}
+      {/* Bokeh */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
@@ -507,39 +570,24 @@ export default function BeforeandAfter() {
       {/* Main content */}
       <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 pt-8 pb-8">
         <div className="flex flex-col items-center text-center mb-14">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mb-5"
-          >
+          <div className="mb-5">
             <SectionEyebrow />
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 22 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              duration: 0.65,
-              delay: 0.15,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+          </div>
+          <h2
             className="text-4xl sm:text-5xl lg:text-6xl xl:text-[68px] font-bold leading-[1.08] tracking-tight mb-5 font-playfair"
             style={{ color: "var(--text-heading)" }}
           >
             Imagine Your <span className="text-accent-gradient">Home</span> Like
             This
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.55, delay: 0.26 }}
+          </h2>
+          <p
             className="text-base sm:text-lg max-w-xl"
             style={{ color: "var(--text-muted)" }}
           >
             From clean roofline lighting to complete residential holiday
             displays, our team transforms Denver homes into memorable Christmas
             experiences
-          </motion.p>
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-14">

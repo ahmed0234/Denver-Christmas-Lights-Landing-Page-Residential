@@ -1,8 +1,6 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   ShieldCheck,
@@ -218,17 +216,8 @@ function BenefitCard({
   const hoverShadow = `inset 0 1px 0 var(--highlight-card), var(--shadow-card-hover)`;
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{
-        duration: 0.55,
-        delay: col * 0.07 + row * 0.12,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -6, transition: { duration: 0.25, ease: "easeOut" } }}
-      className="group relative flex flex-col gap-0 cursor-pointer min-h-[240px] sm:min-h-[260px]"
+    <article
+      className="group relative flex flex-col gap-0 cursor-pointer min-h-[240px] sm:min-h-[260px] transition-transform duration-300 hover:-translate-y-1.5"
       style={{
         background: baseBg,
         border: "1.5px solid transparent",
@@ -236,7 +225,7 @@ function BenefitCard({
         padding: "32px",
         boxShadow: baseShadow,
         transition:
-          "box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s cubic-bezier(0.22,1,0.36,1)",
+          "box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.25s ease-out",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
@@ -319,21 +308,17 @@ function BenefitCard({
           {card.badge}
         </span>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 export default function WhyChooseUs() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerInView = useInView(sectionRef, { once: true, margin: "-80px" });
-
   const containerBg = `linear-gradient(170deg, var(--container-bg-top) 0%, var(--container-bg-bottom) 100%) padding-box, var(--container-border) border-box`;
   const containerShadow = `inset 0 1px 0 var(--highlight-card), var(--shadow-card-hover)`;
 
   return (
     <section
-      ref={sectionRef}
       id="why-choose-us"
       className="relative w-full overflow-hidden"
       style={{ background: "var(--bg-primary)" }}
@@ -502,22 +487,10 @@ export default function WhyChooseUs() {
 
           {/* Left column content */}
           <div className="relative z-10 w-full lg:max-w-[48%] p-7 sm:p-10 lg:p-14 xl:p-16 flex flex-col justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.45, delay: 0.05 }}
-              className="mb-5 sm:mb-6"
-            >
+            <div className="mb-5 sm:mb-6">
               <SectionEyebrow text="WHY HOMEOWNERS CHOOSE PROFESSIONAL INSTALLATION" />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 24 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.7,
-                delay: 0.15,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+            </div>
+            <h2
               className="font-bold leading-[0.95] tracking-tight mb-5 sm:mb-6"
               style={{
                 color: "var(--text-heading)",
@@ -528,24 +501,16 @@ export default function WhyChooseUs() {
               <span className="text-accent-gradient"> Homeowners</span>
               <br />
               Choose Denver Christmas Lights
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.28 }}
+            </h2>
+            <p
               className="text-base sm:text-lg leading-relaxed mb-7 sm:mb-8"
               style={{ color: "var(--text-muted)", maxWidth: "520px" }}
             >
               Professional Christmas lighting that saves you time, keeps your
               home safe, and delivers a stunning display you'll be proud of
               without the hassle
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={headerInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: 0.38 }}
-              className="flex flex-wrap gap-3.5 sm:gap-0 sm:flex-nowrap items-center"
-            >
+            </p>
+            <div className="flex flex-wrap gap-3.5 sm:gap-0 sm:flex-nowrap items-center">
               <div
                 className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl backdrop-blur-md"
                 style={{
@@ -583,22 +548,16 @@ export default function WhyChooseUs() {
                   </div>
                 );
               })}
-            </motion.div>
+            </div>
           </div>
         </div>
 
         {/* ── BENEFITS GRID ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
           {CARDS.map((card, i) => (
             <BenefitCard key={card.num} card={card} index={i} />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* ── BOTTOM CTA CARD ── */}
@@ -672,13 +631,7 @@ export default function WhyChooseUs() {
 
             {/* CTA content */}
             <div className="relative z-10 p-8 sm:p-12 lg:p-16 py-14 sm:py-16">
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                className="relative max-w-[620px]"
-              >
+              <div className="relative max-w-[620px]">
                 <SectionEyebrow text="Ready to Get Started?" />
                 <h2
                   className="font-bold leading-[0.98] mt-5 mb-4"
@@ -705,16 +658,11 @@ export default function WhyChooseUs() {
 
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                   {/* Primary CTA */}
-                  <motion.a
+                  <a
                     href="#quote"
                     id="why-cta-quote"
                     onClick={handleGetQuoteClick}
-                    whileHover={{
-                      scale: 1.03,
-                      boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn)`,
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    className="relative flex items-center gap-2.5 px-7 py-4 rounded-xl font-bold text-sm tracking-wide overflow-hidden cursor-pointer"
+                    className="relative flex items-center gap-2.5 px-7 py-4 rounded-xl font-bold text-sm tracking-wide overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97]"
                     style={{
                       background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
                       boxShadow: `var(--shadow-btn), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
@@ -733,7 +681,7 @@ export default function WhyChooseUs() {
                       GET MY FREE QUOTE
                     </span>
                     <ArrowRight size={16} className="relative text-amber-950" />
-                  </motion.a>
+                  </a>
 
                   {/* Phone */}
                   <a
@@ -767,7 +715,7 @@ export default function WhyChooseUs() {
                     </div>
                   </a>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>

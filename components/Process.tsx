@@ -13,7 +13,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import {
   Snowflake,
@@ -88,7 +87,6 @@ const SPARKLES = Array.from({ length: 6 }, (_, i) => {
 
 export default function ProcessSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
   const timelineRowRef = useRef<HTMLDivElement>(null);
   const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -147,6 +145,7 @@ export default function ProcessSection() {
           src="/Process/Background.webp"
           alt=""
           fill
+          sizes="100vw"
           loading="lazy"
           aria-hidden="true"
           className="object-cover object-center opacity-40 sm:opacity-90 md:opacity-50 brightness-95 saturate-110 contrast-105"
@@ -223,12 +222,7 @@ export default function ProcessSection() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-6 text-center">
         {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4 }}
-          className="flex flex-col items-center gap-3"
-        >
+        <div className="flex flex-col items-center gap-3">
           <Snowflake
             className="h-4 w-4 text-[var(--color-gold,#e8b873)] drop-shadow-[0_0_6px_var(--color-gold,#e8b873)]"
             strokeWidth={1.5}
@@ -240,15 +234,10 @@ export default function ProcessSection() {
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-[var(--color-gold,#e8b873)]/60 sm:w-16" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Heading */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.45, delay: 0.1 }}
-          className="mt-6 flex flex-col items-center gap-1 font-sans text-[2.1rem] font-bold tracking-tight text-[var(--color-text-primary,#f7f3ec)] sm:gap-2 sm:text-4xl md:text-5xl lg:text-[3.75rem]"
-        >
+        <h2 className="mt-6 flex flex-col items-center gap-1 font-sans text-[2.1rem] font-bold tracking-tight text-[var(--color-text-primary,#f7f3ec)] sm:gap-2 sm:text-4xl md:text-5xl lg:text-[3.75rem]">
           <span className="leading-[1.2]">{CONTENT.heading.line1} </span>
           <span className="leading-[1.2]">
             {CONTENT.heading.line2Prefix}
@@ -256,32 +245,22 @@ export default function ProcessSection() {
               {CONTENT.heading.line2Highlight}
             </span>
           </span>
-        </motion.h2>
+        </h2>
 
         {/* Divider between heading and subtitle */}
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={isInView ? { opacity: 1, scaleX: 1 } : {}}
-          transition={{ duration: 0.35, delay: 0.15 }}
-          className="mt-6 flex items-center gap-3 origin-center"
-        >
+        <div className="mt-6 flex items-center gap-3 origin-center">
           <span className="h-px w-14 bg-gradient-to-r from-transparent to-[var(--color-gold,#e8b873)]/50 sm:w-20" />
           <Snowflake
             className="h-3 w-3 shrink-0 text-[var(--color-gold,#e8b873)]/70"
             strokeWidth={1.5}
           />
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-[var(--color-gold,#e8b873)]/50 sm:w-20" />
-        </motion.div>
+        </div>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.35, delay: 0.2 }}
-          className="mt-5 max-w-xl text-sm text-[var(--color-text-muted,#cbc3b6)]/80 sm:text-base"
-        >
+        <p className="mt-5 max-w-xl text-sm text-[var(--color-text-muted,#cbc3b6)]/80 sm:text-base">
           {CONTENT.subtitle}
-        </motion.p>
+        </p>
 
         {/* Timeline */}
         <div className="relative mt-12 w-full sm:mt-24 md:mt-10">
@@ -331,11 +310,8 @@ export default function ProcessSection() {
             {CONTENT.steps.map((step, i) => {
               const Icon = step.icon;
               return (
-                <motion.div
+                <div
                   key={step.number}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
                   className="process-step relative flex flex-col items-center"
                 >
                   {/* Number */}
@@ -375,27 +351,19 @@ export default function ProcessSection() {
                   <p className="mx-auto mt-4 max-w-[15rem] text-sm leading-relaxed text-[var(--color-text-muted,#cbc3b6)]/75">
                     {step.description}
                   </p>
-                </motion.div>
+                </div>
               );
             })}
           </div>
         </div>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.45, delay: 0.45 }}
-          className="process-cta relative mt-10 sm:mt-10"
-        >
+        <div className="process-cta relative mt-10 sm:mt-10">
           <div className="pointer-events-none absolute -inset-6 rounded-full bg-[var(--color-gold,#e8b873)]/50 opacity-70 blur-2xl animate-pulse" />
-          <motion.button
+          <button
             type="button"
             onClick={handleGetQuoteClick}
-            className="relative flex w-full max-w-md items-center justify-between gap-3 rounded-full bg-gradient-to-b from-[var(--color-gold-light,#f8e3ab)]/90 via-[var(--color-gold,#e8b873)]/70 to-[var(--color-gold-dark,#a9762f)]/90 p-[1.5px] shadow-[0_14px_34px_-10px_rgba(0,0,0,0.65)] sm:w-auto cursor-pointer"
-            whileHover={{ y: -3 }}
-            whileTap={{ y: 0, scale: 0.99 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="group relative flex w-full max-w-md items-center justify-between gap-3 rounded-full bg-gradient-to-b from-[var(--color-gold-light,#f8e3ab)]/90 via-[var(--color-gold,#e8b873)]/70 to-[var(--color-gold-dark,#a9762f)]/90 p-[1.5px] shadow-[0_14px_34px_-10px_rgba(0,0,0,0.65)] sm:w-auto cursor-pointer transition-transform duration-200 hover:-translate-y-1 active:translate-y-0 active:scale-[0.99]"
           >
             <span className="flex w-full items-center justify-between gap-3 rounded-full bg-gradient-to-b from-[var(--color-gold-light,#f8e3ab)] via-[var(--color-gold,#e8b873)] to-[var(--color-gold-dark,#a9762f)] px-3 py-3 shadow-[inset_0_2px_2px_rgba(255,255,255,0.65),inset_0_-6px_10px_rgba(0,0,0,0.3)] sm:px-4">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]">
@@ -407,26 +375,18 @@ export default function ProcessSection() {
               <span className="flex-1 whitespace-nowrap px-2 text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-button-text,#241804)] sm:text-sm">
                 {CONTENT.cta}
               </span>
-              <motion.span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]"
-                whileHover={{ x: 3 }}
-              >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)] transition-transform duration-200 group-hover:translate-x-1">
                 <ArrowRight
                   className="h-4 w-4 text-[var(--color-button-text,#241804)]"
                   strokeWidth={2}
                 />
-              </motion.span>
+              </span>
             </span>
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
         {/* Trust indicators */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4, delay: 0.55 }}
-          className="mt-8 flex flex-col items-center gap-3 text-[var(--color-text-muted,#cbc3b6)]/65 sm:mt-9 sm:flex-row sm:gap-0 sm:divide-x sm:divide-[var(--color-gold,#e8b873)]/20"
-        >
+        <div className="mt-8 flex flex-col items-center gap-3 text-[var(--color-text-muted,#cbc3b6)]/65 sm:mt-9 sm:flex-row sm:gap-0 sm:divide-x sm:divide-[var(--color-gold,#e8b873)]/20">
           {CONTENT.trust.map((item) => {
             const Icon = item.icon;
             return (
@@ -442,7 +402,7 @@ export default function ProcessSection() {
               </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
 
       <style jsx>{`

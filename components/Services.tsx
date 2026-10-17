@@ -2,7 +2,6 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
 import {
   Snowflake,
   Home,
@@ -76,67 +75,137 @@ function BeforeAfterSlider({
   afterAlt: string;
 }) {
   const [sliderPos, setSliderPos] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const updateSlider = useCallback((clientX: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    setSliderPos(
-      (Math.max(0, Math.min(clientX - rect.left, rect.width)) / rect.width) *
-        100,
-    );
+  const clipRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const rafId = useRef<number | null>(null);
+  const posRef = useRef(50);
+
+  const applyPos = useCallback((pos: number) => {
+    posRef.current = pos;
+    if (clipRef.current) {
+      clipRef.current.style.clipPath = `inset(0 ${100 - pos}% 0 0)`;
+    }
+    if (lineRef.current) {
+      lineRef.current.style.left = `${pos}%`;
+    }
+    if (handleRef.current) {
+      handleRef.current.style.left = `${pos}%`;
+    }
+    if (containerRef.current) {
+      containerRef.current.setAttribute("aria-valuenow", String(Math.round(pos)));
+    }
   }, []);
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      isDragging.current = true;
-      updateSlider(e.clientX);
+
+  const updateFromClientX = useCallback(
+    (clientX: number) => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.width <= 0) return;
+        const rawPos = ((clientX - rect.left) / rect.width) * 100;
+        const clamped = Math.max(0, Math.min(100, rawPos));
+        applyPos(clamped);
+      });
     },
-    [updateSlider],
+    [applyPos]
   );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return;
+      isDraggingRef.current = true;
+      setIsDragging(true);
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Safe fallback
+      }
+      updateFromClientX(e.clientX);
+    },
+    [updateFromClientX]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      updateFromClientX(e.clientX);
+    },
+    [updateFromClientX]
+  );
+
+  const stopDragging = useCallback(
+    (e?: React.PointerEvent<HTMLDivElement>) => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      setSliderPos(posRef.current);
+      if (e) {
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          // Safe fallback
+        }
+      }
+    },
+    []
+  );
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      let step = 0;
+      if (e.key === "ArrowLeft") step = e.shiftKey ? -5 : -2;
+      else if (e.key === "ArrowRight") step = e.shiftKey ? 5 : 2;
+      else if (e.key === "PageDown") step = -10;
+      else if (e.key === "PageUp") step = 10;
+      else if (e.key === "Home") step = -100;
+      else if (e.key === "End") step = 100;
+
+      if (step !== 0) {
+        e.preventDefault();
+        const next = Math.max(0, Math.min(100, posRef.current + step));
+        applyPos(next);
+        setSliderPos(next);
+      }
+    },
+    [applyPos]
+  );
+
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (isDragging.current) updateSlider(e.clientX);
+    const handleGlobalPointerUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+        setSliderPos(posRef.current);
+      }
     };
-    const onMouseUp = () => {
-      isDragging.current = false;
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("pointerup", handleGlobalPointerUp);
+    window.addEventListener("pointercancel", handleGlobalPointerUp);
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("pointerup", handleGlobalPointerUp);
+      window.removeEventListener("pointercancel", handleGlobalPointerUp);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [updateSlider]);
-  const onTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      isDragging.current = true;
-      updateSlider(e.touches[0].clientX);
-    },
-    [updateSlider],
-  );
-  const onTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (isDragging.current) updateSlider(e.touches[0].clientX);
-    },
-    [updateSlider],
-  );
-  const onTouchEnd = useCallback(() => {
-    isDragging.current = false;
-  }, []);
-  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") setSliderPos((p) => Math.max(0, p - 2));
-    if (e.key === "ArrowRight") setSliderPos((p) => Math.min(100, p + 2));
   }, []);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full select-none overflow-hidden cursor-col-resize"
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      className={`relative w-full h-full select-none overflow-hidden ${
+        isDragging ? "cursor-grabbing" : "cursor-ew-resize"
+      }`}
+      style={{
+        touchAction: isDragging ? "none" : "pan-y",
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={stopDragging}
+      onPointerCancel={stopDragging}
       role="slider"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -149,46 +218,64 @@ function BeforeAfterSlider({
         src={afterImage}
         alt={afterAlt}
         fill
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
+        sizes="(max-width: 1024px) 100vw, 50vw"
         loading="lazy"
-        quality={75}
-        className="absolute inset-0 w-full h-full object-cover"
+        decoding="async"
+        quality={90}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
         draggable={false}
       />
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+        ref={clipRef}
+        className="absolute inset-0 pointer-events-none overflow-hidden select-none"
+        style={{
+          clipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
+          willChange: isDragging ? "clip-path" : "auto",
+        }}
       >
         <Image
           src={beforeImage}
           alt={beforeAlt}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
+          sizes="(max-width: 1024px) 100vw, 50vw"
           loading="lazy"
-          quality={75}
-          className="absolute inset-0 w-full h-full object-cover"
+          decoding="async"
+          quality={90}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           draggable={false}
         />
       </div>
       <div
-        className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
+        ref={lineRef}
+        className="absolute top-0 bottom-0 w-[2px] pointer-events-none z-10"
         style={{
           left: `${sliderPos}%`,
           transform: "translateX(-50%)",
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 15%, rgba(255,255,255,0.9) 85%, rgba(255,255,255,0) 100%)",
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 15%, rgba(255,255,255,0.92) 85%, rgba(255,255,255,0) 100%)",
+          filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))",
+          willChange: isDragging ? "left" : "auto",
         }}
       />
       <div
-        className="absolute top-1/2 z-10 pointer-events-none"
-        style={{ left: `${sliderPos}%`, transform: "translate(-50%, -50%)" }}
+        ref={handleRef}
+        className="absolute top-1/2 z-20 pointer-events-none"
+        style={{
+          left: `${sliderPos}%`,
+          transform: "translate(-50%, -50%)",
+          willChange: isDragging ? "left" : "auto",
+        }}
       >
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center"
+          className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-150 ${
+            isDragging ? "scale-110 shadow-lg" : "hover:scale-105"
+          }`}
           style={{
-            background: "rgba(255,255,255,0.95)",
-            boxShadow:
-              "0 2px 16px rgba(0,0,0,0.65), 0 0 0 1.5px rgba(255,255,255,0.4)",
+            background: "rgba(255,255,255,0.96)",
+            boxShadow: isDragging
+              ? "0 4px 20px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.6)"
+              : "0 2px 16px rgba(0,0,0,0.65), 0 0 0 1.5px rgba(255,255,255,0.4)",
+            backdropFilter: "blur(4px)",
           }}
         >
           <ChevronLeft
@@ -204,7 +291,7 @@ function BeforeAfterSlider({
         </div>
       </div>
       <div
-        className="absolute bottom-3 left-3 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white pointer-events-none"
+        className="absolute bottom-3 left-3 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white pointer-events-none z-10 select-none"
         style={{
           background: "rgba(9,7,7,0.78)",
           backdropFilter: "blur(4px)",
@@ -215,7 +302,7 @@ function BeforeAfterSlider({
         BEFORE
       </div>
       <div
-        className="absolute bottom-3 right-3 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white pointer-events-none"
+        className="absolute bottom-3 right-3 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] uppercase text-white pointer-events-none z-10 select-none"
         style={{
           background: "var(--accent)",
           boxShadow: "0 2px 10px var(--accent-glow-soft)",
@@ -234,7 +321,6 @@ function FeaturedCard({
   icon: Icon,
   beforeImage,
   afterImage,
-  delay = 0,
 }: {
   title: string;
   icon: React.ElementType;
@@ -246,17 +332,12 @@ function FeaturedCard({
   const hoverShadow = `var(--shadow-card-hover), 0 0 0 1px var(--accent), inset 0 1px 0 var(--highlight-card)`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6, transition: { duration: 0.25, ease: "easeOut" } }}
-      className="group relative flex-1 min-w-0 rounded-2xl overflow-hidden"
+    <div
+      className="group relative flex-1 min-w-0 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
       style={{
         border: "1px solid var(--border-color)",
         boxShadow: baseShadow,
-        transition: "box-shadow 0.3s ease",
+        transition: "box-shadow 0.3s ease, transform 0.25s ease",
       }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLDivElement).style.boxShadow = hoverShadow;
@@ -298,7 +379,7 @@ function FeaturedCard({
           />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -481,7 +562,6 @@ function ServiceCard({
   icon: Icon,
   title,
   description,
-  delay = 0,
   hasStringLights = false,
   hasLightStrand = false,
 }: ServiceCardProps) {
@@ -491,14 +571,7 @@ function ServiceCard({
   const hoverShadow = `inset 0 1px 0 var(--highlight-card), var(--shadow-card-hover)`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -7, transition: { duration: 0.25, ease: "easeOut" } }}
-      className="group relative flex flex-col items-center"
-    >
+    <div className="group relative flex flex-col items-center transition-all duration-300 hover:-translate-y-1.5">
       {/* Floating icon above card */}
       <div className="relative z-20 mb-[-26px] flex-shrink-0">
         <div
@@ -537,7 +610,6 @@ function ServiceCard({
           (e.currentTarget as HTMLDivElement).style.boxShadow = baseShadow;
         }}
       >
-        {/* Inner radial glow from top */}
         <div
           className="absolute inset-0 pointer-events-none z-[1]"
           aria-hidden="true"
@@ -546,7 +618,6 @@ function ServiceCard({
               "radial-gradient(ellipse 70% 45% at 50% 0%, var(--accent-glow-faint) 0%, transparent 70%)",
           }}
         />
-        {/* Top highlight line */}
         <div
           className="absolute inset-x-10 top-0 h-px pointer-events-none z-[2]"
           aria-hidden="true"
@@ -577,7 +648,6 @@ function ServiceCard({
           >
             {description}
           </p>
-          {/* Decorative accent */}
           <div className="flex items-center gap-2.5 mt-auto opacity-45 group-hover:opacity-100 transition-opacity duration-500">
             <div
               className="w-6 h-px"
@@ -603,7 +673,6 @@ function ServiceCard({
           </div>
         </div>
 
-        {/* Chamfer corner dots */}
         <div
           className="absolute w-[3px] h-[3px] rounded-full pointer-events-none z-[5]"
           aria-hidden="true"
@@ -625,7 +694,7 @@ function ServiceCard({
           }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -634,7 +703,6 @@ function TrustItem({
   icon: Icon,
   title,
   subtitle,
-  delay = 0,
 }: {
   icon: React.ElementType;
   title: string;
@@ -642,13 +710,7 @@ function TrustItem({
   delay?: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="flex items-center gap-3"
-    >
+    <div className="flex items-center gap-3">
       <div
         className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
         style={{
@@ -679,29 +741,24 @@ function TrustItem({
           {subtitle}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 // ─── Main Services Export ─────────────────────────────────────────────────────
 export default function Services() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-
   const featuredCards = [
     {
       title: "Residential Installation",
       icon: Home,
       beforeImage: "/BeforeAfter/services/before.webp",
       afterImage: "/BeforeAfter/services/after.webp",
-      delay: 0.1,
     },
     {
       title: "Large Home Installation",
       icon: Building2,
       beforeImage: "/BeforeAfter/LargeHouse/Before.webp",
       afterImage: "/BeforeAfter/LargeHouse/After.webp",
-      delay: 0.2,
     },
   ];
 
@@ -711,7 +768,6 @@ export default function Services() {
       title: "Maintenance\n& Support",
       description:
         "We keep your lights shining all season long. Quick response for any issue, replacements, and tune-ups whenever you need.",
-      delay: 0.1,
       hasStringLights: false,
       hasLightStrand: false,
     },
@@ -720,7 +776,6 @@ export default function Services() {
       title: "Take Down\n& Storage",
       description:
         "We handle the takedown, careful packing, and off-season storage so your lights are safe and ready for next year.",
-      delay: 0.2,
       hasStringLights: true,
       hasLightStrand: false,
     },
@@ -729,7 +784,6 @@ export default function Services() {
       title: "Custom Design\n& Planning",
       description:
         "Every property is unique. We create custom lighting designs tailored to your home or business for the perfect look.",
-      delay: 0.3,
       hasStringLights: false,
       hasLightStrand: false,
     },
@@ -738,7 +792,6 @@ export default function Services() {
       title: "Premium Lights\n& Materials",
       description:
         "We use commercial-grade LED lights that are brighter, safer, and built to withstand Colorado winters.",
-      delay: 0.4,
       hasStringLights: false,
       hasLightStrand: true,
     },
@@ -769,7 +822,6 @@ export default function Services() {
 
   return (
     <section
-      ref={sectionRef}
       id="services"
       className="relative w-full overflow-hidden"
       style={{ background: "var(--bg-primary)" }}
@@ -784,7 +836,7 @@ export default function Services() {
         }}
       />
 
-      {/* Bokeh (GPU CSS keyframe powered — 0 JS execution) */}
+      {/* Bokeh */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
@@ -821,20 +873,10 @@ export default function Services() {
       <div className="relative z-10 w-full px-5 sm:px-8 lg:px-14 xl:px-20 2xl:px-28 pt-24 pb-20">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-14">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mb-4"
-          >
+          <div className="mb-4">
             <SectionEyebrow />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.45, delay: 0.18 }}
-            className="mb-5"
-          >
+          </div>
+          <div className="mb-5">
             <Snowflake
               size={18}
               style={{
@@ -842,17 +884,8 @@ export default function Services() {
                 filter: "drop-shadow(0 0 8px var(--accent-glow))",
               }}
             />
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 22 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              duration: 0.7,
-              delay: 0.24,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="text-4xl sm:text-5xl lg:text-[58px] xl:text-[55px] font-bold leading-[1.08] tracking-tight mb-6 font-sans"
-          >
+          </div>
+          <h2 className="text-4xl sm:text-5xl lg:text-[58px] xl:text-[55px] font-bold leading-[1.08] tracking-tight mb-6 font-sans">
             <span style={{ color: "var(--text-heading)" }}>
               Complete Residential{" "}
             </span>
@@ -860,17 +893,14 @@ export default function Services() {
               Christmas Light Installation
             </span>{" "}
             in Denver
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.36 }}
+          </h2>
+          <p
             className="text-base sm:text-lg leading-relaxed max-w-[540px]"
             style={{ color: "var(--text-muted)" }}
           >
             Clean, professionally installed lighting designed to complement the
             shape and structure of your home
-          </motion.p>
+          </p>
         </div>
 
         {/* Featured cards */}
@@ -882,7 +912,6 @@ export default function Services() {
               icon={card.icon}
               beforeImage={card.beforeImage}
               afterImage={card.afterImage}
-              delay={card.delay}
             />
           ))}
         </div>
@@ -895,7 +924,6 @@ export default function Services() {
               icon={card.icon}
               title={card.title}
               description={card.description}
-              delay={card.delay}
               hasStringLights={card.hasStringLights}
               hasLightStrand={card.hasLightStrand}
             />
@@ -903,11 +931,7 @@ export default function Services() {
         </div>
 
         {/* Trust bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        <div
           className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4 px-6 py-5 rounded-2xl"
           style={{
             background: `linear-gradient(160deg, var(--gradient-card-top) 0%, var(--gradient-card-bottom) 100%) padding-box, var(--card-border-gradient) border-box`,
@@ -932,12 +956,11 @@ export default function Services() {
                   icon={item.icon}
                   title={item.title}
                   subtitle={item.subtitle}
-                  delay={0.15 + i * 0.08}
                 />
               </div>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom fade */}

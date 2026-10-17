@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { Palette, X, Check } from "lucide-react";
 import { useTheme, THEMES, type ThemeId } from "./ThemeContext";
 
 // ─── Individual theme option row ──────────────────────────────────────────────
 function ThemeOption({
-  id,
   name,
   description,
   swatches,
@@ -24,7 +22,7 @@ function ThemeOption({
   return (
     <button
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left cursor-pointer"
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left cursor-pointer transition-colors"
       style={{
         background: isActive
           ? `linear-gradient(135deg, var(--accent-glow-soft) 0%, var(--accent-glow-faint) 100%)`
@@ -106,108 +104,102 @@ export default function ThemeSwitcher() {
       className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3"
     >
       {/* ── Expanded Panel ── */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="switcher-panel"
-            initial={{ opacity: 0, scale: 0.88, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.88, y: 12 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="w-[248px] rounded-2xl overflow-hidden"
+      {open && (
+        <div
+          key="switcher-panel"
+          className="w-[248px] rounded-2xl overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
+          style={{
+            background: `linear-gradient(170deg, var(--gradient-card-top) 0%, var(--gradient-card-bottom) 100%)`,
+            backdropFilter: "blur(24px) saturate(180%)",
+            WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            border: "1px solid var(--border-color)",
+            boxShadow:
+              "var(--switcher-shadow), inset 0 1px 0 var(--highlight-card)",
+          }}
+        >
+          {/* Panel header */}
+          <div
+            className="flex items-center justify-between px-4 pt-3.5 pb-2.5"
             style={{
-              background: `linear-gradient(170deg, var(--gradient-card-top) 0%, var(--gradient-card-bottom) 100%)`,
-              backdropFilter: "blur(24px) saturate(180%)",
-              WebkitBackdropFilter: "blur(24px) saturate(180%)",
-              border: "1px solid var(--border-color)",
-              boxShadow: "var(--switcher-shadow), inset 0 1px 0 var(--highlight-card)",
+              borderBottom: "1px solid var(--border-color)",
+              background:
+                "linear-gradient(180deg, var(--accent-glow-faint) 0%, transparent 100%)",
             }}
           >
-            {/* Panel header */}
-            <div
-              className="flex items-center justify-between px-4 pt-3.5 pb-2.5"
-              style={{
-                borderBottom: "1px solid var(--border-color)",
-                background: "linear-gradient(180deg, var(--accent-glow-faint) 0%, transparent 100%)",
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-5 h-5 rounded-md flex items-center justify-center"
-                  style={{
-                    background: `linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)`,
-                    boxShadow: "var(--glow-btn)",
-                  }}
-                >
-                  <Palette size={11} color="#fff" />
-                </div>
-                <span
-                  className="text-[11px] font-bold tracking-[0.16em] uppercase"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  Visual Theme
-                </span>
-              </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="w-6 h-6 rounded-full flex items-center justify-center"
+            <div className="flex items-center gap-2">
+              <div
+                className="w-5 h-5 rounded-md flex items-center justify-center"
                 style={{
-                  background: "var(--accent-glow-faint)",
-                  border: "1px solid var(--border-color)",
-                  color: "var(--text-muted)",
+                  background: `linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)`,
+                  boxShadow: "var(--glow-btn)",
                 }}
-                aria-label="Close theme switcher"
               >
-                <X size={11} />
-              </button>
-            </div>
-
-            {/* Options */}
-            <div className="p-2 flex flex-col gap-0.5">
-              {THEMES.map((t) => (
-                <ThemeOption
-                  key={t.id}
-                  id={t.id}
-                  name={t.name}
-                  description={t.description}
-                  swatches={t.swatches}
-                  isActive={theme === t.id}
-                  onSelect={() => {
-                    setTheme(t.id);
-                    setTimeout(() => setOpen(false), 320);
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div
-              className="px-4 py-2.5 text-center"
-              style={{ borderTop: "1px solid var(--border-color)" }}
-            >
+                <Palette size={11} color="#fff" />
+              </div>
               <span
-                className="text-[9px] tracking-[0.14em] uppercase"
+                className="text-[11px] font-bold tracking-[0.16em] uppercase"
                 style={{ color: "var(--text-muted)" }}
               >
-                Saved automatically ·{" "}
-                <span style={{ color: "var(--accent)" }}>
-                  {activeTheme?.name}
-                </span>
+                Visual Theme
               </span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <button
+              onClick={() => setOpen(false)}
+              className="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+              style={{
+                background: "var(--accent-glow-faint)",
+                border: "1px solid var(--border-color)",
+                color: "var(--text-muted)",
+              }}
+              aria-label="Close theme switcher"
+            >
+              <X size={11} />
+            </button>
+          </div>
+
+          {/* Options */}
+          <div className="p-2 flex flex-col gap-0.5">
+            {THEMES.map((t) => (
+              <ThemeOption
+                key={t.id}
+                id={t.id}
+                name={t.name}
+                description={t.description}
+                swatches={t.swatches}
+                isActive={theme === t.id}
+                onSelect={() => {
+                  setTheme(t.id);
+                  setTimeout(() => setOpen(false), 320);
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div
+            className="px-4 py-2.5 text-center"
+            style={{ borderTop: "1px solid var(--border-color)" }}
+          >
+            <span
+              className="text-[9px] tracking-[0.14em] uppercase"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Saved automatically ·{" "}
+              <span style={{ color: "var(--accent)" }}>
+                {activeTheme?.name}
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* ── Floating Trigger Button ── */}
-      <motion.button
+      <button
         id="theme-switcher-btn"
         onClick={() => setOpen((v) => !v)}
         aria-label="Switch theme"
         aria-expanded={open}
-        whileHover={{ scale: 1.07 }}
-        whileTap={{ scale: 0.93 }}
-        className="relative flex items-center gap-2.5 h-11 rounded-full overflow-hidden"
+        className="relative flex items-center gap-2.5 h-11 rounded-full overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
         style={{
           paddingLeft: "14px",
           paddingRight: "18px",
@@ -215,14 +207,16 @@ export default function ThemeSwitcher() {
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
           border: "1px solid var(--border-color)",
-          boxShadow: "var(--switcher-shadow), inset 0 1px 0 var(--highlight-card)",
+          boxShadow:
+            "var(--switcher-shadow), inset 0 1px 0 var(--highlight-card)",
         }}
       >
         {/* Top shine */}
         <span
           className="absolute inset-x-0 top-0 h-1/2 rounded-t-full pointer-events-none"
           style={{
-            background: "linear-gradient(180deg, var(--highlight-surface) 0%, transparent 100%)",
+            background:
+              "linear-gradient(180deg, var(--highlight-surface) 0%, transparent 100%)",
           }}
         />
 
@@ -255,7 +249,7 @@ export default function ThemeSwitcher() {
         >
           Theme
         </span>
-      </motion.button>
+      </button>
     </div>
   );
 }

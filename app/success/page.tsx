@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
 import { CheckCircle2, Phone, ArrowLeft, Sparkles, Snowflake, Calendar, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,11 +22,8 @@ export default function SuccessPage() {
 
       <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-32 sm:pt-40 pb-20 flex-1 flex flex-col justify-center items-center text-center">
         {/* Animated Check Icon */}
-        <motion.div
-          initial={{ scale: 0, rotate: -45 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mb-6 shadow-2xl relative"
+        <div
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mb-6 shadow-2xl relative transition-transform duration-500 hover:scale-105"
           style={{
             background: "linear-gradient(135deg, rgba(245, 200, 106, 0.25) 0%, rgba(229, 169, 50, 0.1) 100%)",
             border: "2px solid var(--accent)",
@@ -38,48 +34,30 @@ export default function SuccessPage() {
             className="w-10 h-10 sm:w-12 sm:h-12 text-amber-300 stroke-[2.2]"
             style={{ filter: "drop-shadow(0 0 8px var(--accent-glow))" }}
           />
-        </motion.div>
+        </div>
 
         {/* Header Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex items-center gap-2 mb-3"
-        >
+        <div className="flex items-center gap-2 mb-3">
           <Sparkles size={16} className="text-amber-400" />
           <span className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--accent)]">
             INQUIRY RECEIVED
           </span>
           <Sparkles size={16} className="text-amber-400" />
-        </motion.div>
+        </div>
 
         {/* Main Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight font-sans"
-        >
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight font-sans">
           Thank You for Requesting Your <br />
           <span className="text-accent-gradient">Free Christmas Light Quote!</span>
-        </motion.h1>
+        </h1>
 
         {/* Description */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-base sm:text-lg text-[var(--text-muted)] max-w-xl mb-10 leading-relaxed"
-        >
+        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-xl mb-10 leading-relaxed">
           Your information has been sent to our team. A Denver Christmas Lights design specialist will review your property details and reach out within 24 hours.
-        </motion.p>
+        </p>
 
         {/* Information Glass Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.5 }}
+        <div
           className="w-full rounded-2xl p-6 sm:p-8 mb-10 border text-left relative overflow-hidden"
           style={{
             background: "linear-gradient(180deg, var(--bg-glass-card) 0%, var(--bg-overlay) 100%)",
@@ -121,15 +99,10 @@ export default function SuccessPage() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md"
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
           <Link
             href="/"
             className="group relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase border text-white hover:text-amber-200 transition-all duration-300"
@@ -146,7 +119,7 @@ export default function SuccessPage() {
           <a
             href="tel:7202967711"
             onClick={handlePhoneCallClick}
-            className="relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase overflow-hidden cursor-pointer shadow-lg transition-all"
+            className="relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase overflow-hidden cursor-pointer shadow-lg transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
             style={{
               background: `linear-gradient(180deg, #FFF4CE 0%, #F5C86A 32%, #E5A932 70%, #B87B15 100%)`,
               border: "1px solid rgba(255, 235, 170, 0.85)",
@@ -157,7 +130,7 @@ export default function SuccessPage() {
             <Phone size={16} className="shrink-0 text-amber-950" />
             <span className="text-amber-950">Call (720) 296-7711</span>
           </a>
-        </motion.div>
+        </div>
       </div>
 
       <Footer />

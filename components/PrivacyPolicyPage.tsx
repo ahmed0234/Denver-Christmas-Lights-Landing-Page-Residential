@@ -19,8 +19,7 @@ import {
   ShieldCheck,
   UserCheck,
 } from "lucide-react";
-import { motion, useInView } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 // ─── Reduced-motion hook (native, version-agnostic) ───────────────────────────
 function usePrefersReducedMotion(): boolean {
@@ -51,47 +50,21 @@ function BentoCard({
   children,
   className = "",
   id,
-  index,
-  prefersReducedMotion,
   style,
   "aria-labelledby": ariaLabelledby,
 }: {
   children: React.ReactNode;
   className?: string;
   id?: string;
-  index: number;
-  prefersReducedMotion: boolean;
+  index?: number;
+  prefersReducedMotion?: boolean;
   style?: React.CSSProperties;
   "aria-labelledby"?: string;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-48px 0px" });
-
   return (
-    <motion.article
-      ref={ref}
+    <article
       id={id}
-      initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-      animate={
-        isInView
-          ? { opacity: 1, y: 0 }
-          : { opacity: 0, y: prefersReducedMotion ? 0 : 20 }
-      }
-      transition={{
-        duration: 0.48,
-        delay: prefersReducedMotion ? 0 : index * 0.055,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={
-        prefersReducedMotion
-          ? {}
-          : {
-              y: -3,
-              boxShadow:
-                "0 18px 56px rgba(0,0,0,0.85), 0 4px 18px rgba(0,0,0,0.5), inset 0 1px 0 var(--highlight-card)",
-            }
-      }
-      className={`relative overflow-hidden group ${className}`}
+      className={`relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_56px_rgba(0,0,0,0.85),0_4px_18px_rgba(0,0,0,0.5),inset_0_1px_0_var(--highlight-card)] ${className}`}
       style={{ ...cardBase, ...style }}
       aria-labelledby={ariaLabelledby}
     >
@@ -111,7 +84,7 @@ function BentoCard({
         aria-hidden="true"
       />
       {children}
-    </motion.article>
+    </article>
   );
 }
 

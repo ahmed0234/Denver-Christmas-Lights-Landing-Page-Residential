@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
 import {
   User,
   Mail,
@@ -365,31 +364,12 @@ export default function QuoteForm() {
       </div>
 
       {/* ── Card ─────────────────────────────────────────────────────────────── */}
-      <motion.div
+      <div
         id="quote-form-container"
         key={animKey}
-        animate={
-          isHighlighting
-            ? {
-                scale: [1, 1.04, 1],
-                borderColor: [
-                  "var(--form-border-color)",
-                  "#F5C86A",
-                  "var(--form-border-color)",
-                ],
-                boxShadow: [
-                  "0 0 0 1px var(--border-color), var(--shadow-card-hover), inset 0 1px 0 var(--highlight-btn)",
-                  "0 0 35px rgba(245, 200, 106, 0.65), 0 0 75px rgba(245, 200, 106, 0.3), 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 2px 6px rgba(255, 255, 255, 0.6)",
-                  "0 0 0 1px var(--border-color), var(--shadow-card-hover), inset 0 1px 0 var(--highlight-btn)",
-                ],
-              }
-            : {}
-        }
-        transition={{
-          duration: 1.1,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className="relative z-10 rounded-2xl overflow-hidden"
+        className={`relative z-10 rounded-2xl overflow-hidden ${
+          isHighlighting ? "animate-form-highlight" : ""
+        }`}
         style={{
           background: `radial-gradient(ellipse 90% 45% at 50% 0%, var(--gradient-form-top) 0%, var(--gradient-form-mid) 38%, var(--gradient-form-bottom) 100%)`,
           border: `2px solid var(--form-border-color)`,
@@ -398,11 +378,8 @@ export default function QuoteForm() {
       >
         {/* Highlight sweep effect during attention phase */}
         {isHighlighting && (
-          <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: "200%", opacity: [0, 0.8, 0.8, 0] }}
-            transition={{ duration: 1.0, ease: "easeInOut" }}
-            className="absolute inset-0 pointer-events-none z-30"
+          <div
+            className="absolute inset-0 pointer-events-none z-30 animate-form-sweep"
             style={{
               background:
                 "linear-gradient(105deg, transparent 0%, rgba(245, 200, 106, 0.05) 25%, rgba(255, 240, 190, 0.35) 50%, rgba(245, 200, 106, 0.05) 75%, transparent 100%)",
@@ -450,14 +427,10 @@ export default function QuoteForm() {
 
           {/* Error Banner */}
           {errorMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-3 rounded-xl bg-red-950/70 border border-red-500/50 flex items-start gap-2.5 text-xs text-red-200"
-            >
+            <div className="mb-4 p-3 rounded-xl bg-red-950/70 border border-red-500/50 flex items-start gap-2.5 text-xs text-red-200 transition-all duration-300">
               <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
               <span className="leading-relaxed">{errorMessage}</span>
-            </motion.div>
+            </div>
           )}
 
           {/* Form fields */}
@@ -515,20 +488,11 @@ export default function QuoteForm() {
             />
 
             {/* ── Submit Button ── */}
-            <motion.button
+            <button
               id="quote-submit"
               type="submit"
               disabled={isSubmitting}
-              whileHover={
-                isSubmitting
-                  ? {}
-                  : {
-                      scale: 1.02,
-                      boxShadow: `var(--shadow-btn-hover), inset 0 1px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)`,
-                    }
-              }
-              whileTap={isSubmitting ? {} : { scale: 0.98 }}
-              className={`relative w-full mt-2 py-3.5 px-2 rounded-xl font-bold text-xs sm:text-sm tracking-[0.16em] uppercase flex items-center justify-center overflow-hidden cursor-pointer ${
+              className={`relative w-full mt-2 py-3.5 px-2 rounded-xl font-bold text-xs sm:text-sm tracking-[0.16em] uppercase flex items-center justify-center overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
                 isSubmitting ? "opacity-75 cursor-not-allowed" : ""
               }`}
               style={{
@@ -573,7 +537,7 @@ export default function QuoteForm() {
                   />
                 )}
               </span>
-            </motion.button>
+            </button>
           </form>
 
           {/* Privacy note */}
@@ -584,7 +548,7 @@ export default function QuoteForm() {
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

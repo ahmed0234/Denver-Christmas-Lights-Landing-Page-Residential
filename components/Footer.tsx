@@ -9,7 +9,6 @@
 import { ThemeLogoIcon } from "@/components/ThemeLogo";
 import { handleGetQuoteClick } from "@/lib/scrollUtils";
 import { Mail, MapPin, Phone, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa6";
 
@@ -96,21 +95,19 @@ export default function Footer() {
               {SOCIAL_LINKS.map((s) => {
                 const Icon = s.icon;
                 return (
-                  <motion.a
+                  <a
                     key={s.label}
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-amber-500/20 bg-amber-950/10 text-amber-300 hover:text-amber-200 hover:border-amber-400/50 hover:bg-amber-500/15 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-amber-500/20 bg-amber-950/10 text-amber-300 hover:text-amber-200 hover:border-amber-400/50 hover:bg-amber-500/15 hover:scale-110 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
                     style={{
                       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
                     }}
                   >
                     <Icon size={16} />
-                  </motion.a>
+                  </a>
                 );
               })}
             </div>
@@ -160,18 +157,11 @@ export default function Footer() {
             {/* ── DUAL CONVERSION CTAS ── */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               {/* Get Free Quote CTA Button */}
-              <motion.a
+              <a
                 id="footer-get-quote-btn"
                 href="#quote"
                 onClick={handleGetQuoteClick}
-                whileHover={{
-                  scale: 1.03,
-                  y: -1.5,
-                  boxShadow:
-                    "0 8px 30px rgba(245, 200, 106, 0.45), inset 0 1.5px 0 rgba(255, 255, 255, 0.85), inset 0 -2px 4px rgba(80, 40, 0, 0.4)",
-                }}
-                whileTap={{ scale: 0.97 }}
-                className="relative group flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 cursor-pointer select-none"
+                className="relative group flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 cursor-pointer select-none transition-all duration-200 hover:scale-[1.03] hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: `linear-gradient(180deg, #FFF4CE 0%, #F5C86A 32%, #E5A932 70%, #B87B15 100%)`,
                   border: "1px solid rgba(255, 235, 170, 0.85)",
@@ -192,20 +182,13 @@ export default function Footer() {
                 <span className="relative font-bold whitespace-nowrap">
                   Get Free Quote
                 </span>
-              </motion.a>
+              </a>
 
               {/* Call Now CTA Button */}
-              <motion.a
+              <a
                 id="footer-call-now-btn"
                 href="tel:7202967711"
-                whileHover={{
-                  scale: 1.03,
-                  y: -1.5,
-                  boxShadow:
-                    "var(--shadow-btn-hover), inset 0 1.5px 0 var(--highlight-btn), inset 0 -2px 4px var(--btn-inner-shadow)",
-                }}
-                whileTap={{ scale: 0.97 }}
-                className="relative group flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0 cursor-pointer select-none"
+                className="relative group flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white shrink-0 cursor-pointer select-none transition-all duration-200 hover:scale-[1.03] hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: `linear-gradient(180deg, var(--gradient-btn-top) 0%, var(--gradient-btn-mid) 45%, var(--gradient-btn-bottom) 100%)`,
                   border: "1px solid rgba(255,255,255,0.2)",
@@ -224,7 +207,7 @@ export default function Footer() {
                 <span className="relative text-amber-950 font-bold whitespace-nowrap">
                   Call Now
                 </span>
-              </motion.a>
+              </a>
             </div>
           </div>
         </div>

@@ -13,7 +13,6 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
 import { Star, User, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
@@ -26,22 +25,122 @@ import "swiper/css/navigation";
 // ─── Particle & Snowfall Data ──────────────────────────────────────────────────
 
 const SNOWFLAKES = [
-  { id: 1, left: "6%", top: "10%", size: "14px", dur: "7s", delay: "0s", opacity: 0.5 },
-  { id: 2, left: "18%", top: "25%", size: "10px", dur: "9s", delay: "1.2s", opacity: 0.4 },
-  { id: 3, left: "32%", top: "8%", size: "16px", dur: "8s", delay: "2.5s", opacity: 0.6 },
-  { id: 4, left: "48%", top: "18%", size: "12px", dur: "10s", delay: "0.5s", opacity: 0.35 },
-  { id: 5, left: "64%", top: "12%", size: "15px", dur: "7.5s", delay: "3s", opacity: 0.55 },
-  { id: 6, left: "78%", top: "22%", size: "11px", dur: "8.5s", delay: "1.8s", opacity: 0.45 },
-  { id: 7, left: "90%", top: "15%", size: "14px", dur: "9.5s", delay: "0.8s", opacity: 0.5 },
-  { id: 8, left: "12%", top: "65%", size: "12px", dur: "8s", delay: "2s", opacity: 0.4 },
-  { id: 9, left: "85%", top: "70%", size: "13px", dur: "7s", delay: "1s", opacity: 0.45 },
+  {
+    id: 1,
+    left: "6%",
+    top: "10%",
+    size: "14px",
+    dur: "7s",
+    delay: "0s",
+    opacity: 0.5,
+  },
+  {
+    id: 2,
+    left: "18%",
+    top: "25%",
+    size: "10px",
+    dur: "9s",
+    delay: "1.2s",
+    opacity: 0.4,
+  },
+  {
+    id: 3,
+    left: "32%",
+    top: "8%",
+    size: "16px",
+    dur: "8s",
+    delay: "2.5s",
+    opacity: 0.6,
+  },
+  {
+    id: 4,
+    left: "48%",
+    top: "18%",
+    size: "12px",
+    dur: "10s",
+    delay: "0.5s",
+    opacity: 0.35,
+  },
+  {
+    id: 5,
+    left: "64%",
+    top: "12%",
+    size: "15px",
+    dur: "7.5s",
+    delay: "3s",
+    opacity: 0.55,
+  },
+  {
+    id: 6,
+    left: "78%",
+    top: "22%",
+    size: "11px",
+    dur: "8.5s",
+    delay: "1.8s",
+    opacity: 0.45,
+  },
+  {
+    id: 7,
+    left: "90%",
+    top: "15%",
+    size: "14px",
+    dur: "9.5s",
+    delay: "0.8s",
+    opacity: 0.5,
+  },
+  {
+    id: 8,
+    left: "12%",
+    top: "65%",
+    size: "12px",
+    dur: "8s",
+    delay: "2s",
+    opacity: 0.4,
+  },
+  {
+    id: 9,
+    left: "85%",
+    top: "70%",
+    size: "13px",
+    dur: "7s",
+    delay: "1s",
+    opacity: 0.45,
+  },
 ];
 
 const BOKEH_LIGHTS = [
-  { id: 1, left: "8%", top: "18%", size: "100px", color: "var(--gold-glow)", opacity: 0.15 },
-  { id: 2, left: "82%", top: "22%", size: "140px", color: "var(--accent-glow)", opacity: 0.2 },
-  { id: 3, left: "45%", top: "75%", size: "120px", color: "var(--gold-glow)", opacity: 0.12 },
-  { id: 4, left: "92%", top: "68%", size: "90px", color: "var(--accent-glow)", opacity: 0.18 },
+  {
+    id: 1,
+    left: "8%",
+    top: "18%",
+    size: "100px",
+    color: "var(--gold-glow)",
+    opacity: 0.15,
+  },
+  {
+    id: 2,
+    left: "82%",
+    top: "22%",
+    size: "140px",
+    color: "var(--accent-glow)",
+    opacity: 0.2,
+  },
+  {
+    id: 3,
+    left: "45%",
+    top: "75%",
+    size: "120px",
+    color: "var(--gold-glow)",
+    opacity: 0.12,
+  },
+  {
+    id: 4,
+    left: "92%",
+    top: "68%",
+    size: "90px",
+    color: "var(--accent-glow)",
+    opacity: 0.18,
+  },
 ];
 
 // ─── Testimonials Data ────────────────────────────────────────────────────────
@@ -114,29 +213,14 @@ const REVIEWS: ReviewItem[] = [
   },
 ];
 
-// ─── Animation Variants ───────────────────────────────────────────────────────
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1], delay },
-  }),
-};
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ReviewsSection() {
-  const containerRef = useRef<HTMLElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-60px" });
-
   const [swiperRef, setSwiperRef] = useState<SwiperClass | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section
-      ref={containerRef}
       id="reviews"
       className="relative w-full overflow-hidden py-8 sm:py-10 lg:py-8 font-sans"
       aria-label="Customer Reviews"
@@ -148,6 +232,7 @@ export default function ReviewsSection() {
           src="/ReviewTestimonial/ReviewsBackground.webp"
           alt=""
           fill
+          sizes="100vw"
           loading="lazy"
           className="object-cover object-center lg:object-right opacity-85 sm:opacity-90 saturate-110 contrast-105 brightness-95"
           quality={75}
@@ -180,7 +265,10 @@ export default function ReviewsSection() {
       </div>
 
       {/* ── Winter Atmosphere: Soft Snowflakes & Golden Bokeh Glares ────── */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+        aria-hidden="true"
+      >
         {/* Soft Golden Bokeh Orbs */}
         {BOKEH_LIGHTS.map((bokeh) => (
           <div
@@ -220,18 +308,10 @@ export default function ReviewsSection() {
 
       {/* ── Content Container (Matching Page Container Width & Padding) ───── */}
       <div className="relative z-10 w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-        
         {/* ── SECTION HEADER ────────────────────────────────────────────── */}
         <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10 sm:mb-14 lg:mb-16">
-          
           {/* Eyebrow Badge */}
-          <motion.div
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={0}
-            className="flex flex-col items-center gap-1.5"
-          >
+          <div className="flex flex-col items-center gap-1.5">
             <div className="flex items-center gap-3">
               <div
                 className="h-px w-8 sm:w-12"
@@ -256,17 +336,16 @@ export default function ReviewsSection() {
             </div>
 
             {/* Tiny Golden Ornament */}
-            <div className="text-[11px] leading-none" style={{ color: "var(--accent)" }}>
+            <div
+              className="text-[11px] leading-none"
+              style={{ color: "var(--accent)" }}
+            >
               ✻
             </div>
-          </motion.div>
+          </div>
 
           {/* Heading */}
-          <motion.h2
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={0.1}
+          <h2
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-bold tracking-tight mt-3 mb-4 leading-[1.15]"
             style={{
               fontFamily: "var(--font-playfair, Georgia, serif)",
@@ -286,30 +365,20 @@ export default function ReviewsSection() {
             >
               Homeowners Say
             </span>
-          </motion.h2>
+          </h2>
 
           {/* Supporting Text */}
-          <motion.p
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={0.18}
+          <p
             className="text-xs sm:text-sm md:text-base leading-relaxed max-w-[42ch]"
             style={{ color: "var(--text-muted)" }}
           >
             Real reviews from real Denver families who trust us to make their
             homes shine bright every holiday season.
-          </motion.p>
+          </p>
         </div>
 
         {/* ── TESTIMONIALS SWIPER CAROUSEL ────────────────────────────────── */}
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={fadeUp}
-          custom={0.25}
-          className="w-full relative px-0"
-        >
+        <div className="w-full relative px-0">
           {/* Custom Navigation Arrows (Desktop Only) */}
           <button
             onClick={() => swiperRef?.slidePrev()}
@@ -410,10 +479,17 @@ export default function ReviewsSection() {
                               <Star
                                 key={i}
                                 size={14}
-                                className={isFull || isPartial ? "fill-current" : "opacity-35"}
+                                className={
+                                  isFull || isPartial
+                                    ? "fill-current"
+                                    : "opacity-35"
+                                }
                                 style={{
                                   color: "var(--accent)",
-                                  filter: isFull || isPartial ? "drop-shadow(0 0 4px var(--accent-glow))" : "none",
+                                  filter:
+                                    isFull || isPartial
+                                      ? "drop-shadow(0 0 4px var(--accent-glow))"
+                                      : "none",
                                 }}
                               />
                             );
@@ -486,7 +562,8 @@ export default function ReviewsSection() {
             <div
               className="h-px w-8 sm:w-16"
               style={{
-                background: "linear-gradient(90deg, transparent, var(--border-color))",
+                background:
+                  "linear-gradient(90deg, transparent, var(--border-color))",
               }}
             />
 
@@ -518,11 +595,12 @@ export default function ReviewsSection() {
             <div
               className="h-px w-8 sm:w-16"
               style={{
-                background: "linear-gradient(90deg, var(--border-color), transparent)",
+                background:
+                  "linear-gradient(90deg, var(--border-color), transparent)",
               }}
             />
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* ── BOTTOM DECORATIVE GOLDEN CURVE ─────────────────────────────────── */}
