@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { CONTACT_API_URL } from "@/lib/api";
 import {
   User,
   Mail,
@@ -315,8 +316,8 @@ export default function QuoteForm() {
         honeypot,
       };
 
-      // Try production deployment API first, fallback to relative API route
-      const response = await fetch("/api/contact", {
+      // Always post to the backend domain, whichever domain serves this page
+      const response = await fetch(CONTACT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

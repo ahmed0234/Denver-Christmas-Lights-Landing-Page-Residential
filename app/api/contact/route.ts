@@ -12,10 +12,26 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+/** Escapes user input before it is placed in the email HTML */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** RFC 5322 display name formatting */
 function formatFromAddress(displayName: string, mailbox: string): string {
   const escaped = displayName.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   return `"${escaped}" <${mailbox}>`;
+}
+
+/** Google Click IDs are URL-safe base64-ish tokens; anything else is dropped. */
+function sanitizeGclid(value: unknown): string {
+  const v = typeof value === "string" ? value.trim() : "";
+  return /^[A-Za-z0-9_-]{1,200}$/.test(v) ? v : "";
 }
 
 // ── CORS Headers Helper ───────────────────────────────────────────────────────
@@ -24,6 +40,8 @@ function getCorsHeaders(origin: string | null) {
     "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
   };
 }
 
@@ -39,10 +57,21 @@ export async function OPTIONS(req: NextRequest) {
 function getBusinessEmailHtml(data: {
   name: string;
   email: string;
+  phone: string;
   zip: string;
   services: string;
   message: string;
+  gclid: string;
 }) {
+  data = {
+    name: escapeHtml(data.name),
+    email: escapeHtml(data.email),
+    phone: escapeHtml(data.phone),
+    zip: escapeHtml(data.zip),
+    services: escapeHtml(data.services),
+    message: escapeHtml(data.message).replace(/\r?\n/g, "<br/>"),
+    gclid: escapeHtml(data.gclid),
+  };
   const formattedServices = data.services
     ? data.services
         .split(",")
@@ -127,13 +156,27 @@ function getBusinessEmailHtml(data: {
                                 <a href="mailto:${data.email}" style="color:#f5c86a !important; font-weight:700; text-decoration:underline;">${data.email}</a>
                               </td>
                             </tr>
+                            <!-- Phone -->
+                            <tr>
+                              <td style="padding:12px 0; font-size:14px; border-bottom:1px solid #2d2b33;">
+                                <span style="color:#d4af37 !important; font-weight:700; display:inline-block; min-width:130px;" class="text-gold">Phone:</span>
+                                ${data.phone ? `<a href="tel:${data.phone.replace(/[^\d+]/g, "")}" style="color:#f5c86a !important; font-weight:700; text-decoration:underline;">${data.phone}</a>` : '<strong style="color:#ffffff !important; font-size:15px;" class="text-white">Not provided</strong>'}
+                              </td>
+                            </tr>
                             <!-- ZIP -->
                             <tr>
-                              <td style="padding-top:12px; font-size:14px;">
+                              <td style="${data.gclid ? "padding:12px 0; border-bottom:1px solid #2d2b33;" : "padding-top:12px;"} font-size:14px;">
                                 <span style="color:#d4af37 !important; font-weight:700; display:inline-block; min-width:130px;" class="text-gold">ZIP Code:</span>
                                 <strong style="color:#ffffff !important; font-size:15px;" class="text-white">${data.zip || "Not provided"}</strong>
                               </td>
                             </tr>
+                            ${data.gclid ? `<!-- GCLID (only for Google Ads clicks) -->
+                            <tr>
+                              <td style="padding-top:12px; font-size:14px;">
+                                <span style="color:#d4af37 !important; font-weight:700; display:inline-block; min-width:130px;" class="text-gold">GCLID:</span>
+                                <span style="color:#ffffff !important; font-family:Consolas, Menlo, monospace; font-size:13px; word-break:break-all;" class="text-white">${data.gclid}</span>
+                              </td>
+                            </tr>` : ""}
                           </table>
                         </td>
                       </tr>
@@ -229,11 +272,13 @@ export async function POST(req: NextRequest) {
   // 2. Extract Data
   const name = String(rawBody.name || "").trim();
   const email = String(rawBody.email || "").trim();
+  const phone = String(rawBody.phone || "").trim();
   const zip = String(rawBody.zip || "").trim();
   const services = String(rawBody.services || rawBody.service || "").trim();
   const message = String(rawBody.message || rawBody.comments || "").trim();
+  const gclid = sanitizeGclid(rawBody.gclid);
 
-  console.log("[contact API] Step 2: Extracted Fields ->", { name, email, zip, services, message });
+  console.log("[contact API] Step 2: Extracted Fields ->", { name, email, phone, zip, services, message, gclid });
 
   // 3. Validation
   if (!name || name.length < 2) {
@@ -264,14 +309,15 @@ export async function POST(req: NextRequest) {
   }
   console.log("[contact API] Step 3: RESEND_API_KEY Loaded Successfully (Prefix:", resendApiKey.substring(0, 6) + "...)");
 
-  const business1 = process.env.BUSINESS_EMAIL ?? "";
-  const business2 = process.env.BUSINESS_EMAIL_2 ?? "";
-  const recipients = [business1, business2].filter(Boolean);
+  /* Each recipient comes from its own env var; missing or blank ones are skipped */
+  const recipients = [process.env.BUSINESS_EMAIL_1, process.env.BUSINESS_EMAIL_2]
+    .map((value) => (value ?? "").trim())
+    .filter(Boolean);
 
   console.log("[contact API] Step 4: Business Inbox Recipients ->", recipients);
 
   if (recipients.length === 0) {
-    console.error("[contact API] CRITICAL ERROR: No recipients found in BUSINESS_EMAIL or BUSINESS_EMAIL_2");
+    console.error("[contact API] CRITICAL ERROR: No recipients found in BUSINESS_EMAIL_1 or BUSINESS_EMAIL_2");
     return NextResponse.json(
       { ok: false, success: false, error: "Server configuration error: No business recipients set." },
       { status: 500, headers: corsHeaders }
@@ -283,32 +329,40 @@ export async function POST(req: NextRequest) {
 
     // Standardized sender using verified domain mailbox support@ikhtiyaar.com
     const fromAddress = formatFromAddress(name || "Website Lead", "support@ikhtiyaar.com");
+    const subject = `🎄 New Christmas Light Quote Request — ${name}`;
+    const html = getBusinessEmailHtml({ name, email, phone, zip, services, message, gclid });
 
     console.log(`[contact API] Step 5: Sending Business Notification Email via Resend to ${recipients.length} recipients...`);
     console.log(`[contact API] From: ${fromAddress}`);
-    console.log(`[contact API] To: ${JSON.stringify(recipients)}`);
     console.log(`[contact API] ReplyTo: ${email}`);
 
-    const businessPayload = {
-      from: fromAddress,
-      to: recipients,
-      replyTo: email,
-      subject: `🎄 New Christmas Light Quote Request — ${name}`,
-      html: getBusinessEmailHtml({ name, email, zip, services, message }),
-    };
+    /* One email per recipient, so a failure for one inbox never blocks the other */
+    const results = await Promise.allSettled(
+      recipients.map((to) =>
+        resend.emails.send({ from: fromAddress, to: [to], replyTo: email, subject, html })
+      )
+    );
 
-    /* Send ONLY to business recipients defined in environment variables */
-    const businessResult = await resend.emails.send(businessPayload);
-    console.log("[contact API] Step 6: Resend Business Email Full Response ->", JSON.stringify(businessResult, null, 2));
+    const failures: string[] = [];
+    results.forEach((result, i) => {
+      const to = recipients[i];
+      if (result.status === "rejected") {
+        console.error(`[contact API] Step 6 ERROR: Exception sending to ${to}:`, result.reason);
+        failures.push(String(result.reason?.message || result.reason));
+      } else if (result.value.error) {
+        console.error(`[contact API] Step 6 ERROR: Resend API error sending to ${to}:`, result.value.error);
+        failures.push(result.value.error.message || "Failed to deliver email.");
+      } else {
+        console.log(`[contact API] Step 6: Sent to ${to} ->`, result.value.data?.id);
+      }
+    });
 
-    if (businessResult.error) {
-      console.error("[contact API] Step 6 ERROR: Resend API Error Sending Business Email:", businessResult.error);
+    if (failures.length === recipients.length) {
       return NextResponse.json(
         {
           ok: false,
           success: false,
-          error: `Resend Error: ${businessResult.error.message || "Failed to deliver email."}`,
-          details: businessResult.error,
+          error: `Resend Error: ${failures[0]}`,
         },
         { status: 502, headers: corsHeaders }
       );

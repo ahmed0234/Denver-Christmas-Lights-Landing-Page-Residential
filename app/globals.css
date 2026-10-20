@@ -629,9 +629,14 @@ a, button, input, select, textarea {
     box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 
+/* ── Text selection ── solid crimson + white (7.5:1 contrast, WCAG AAA).
+   Fixed values (not theme tokens) so selection stays readable in every theme.
+   -webkit-text-fill-color overrides transparent fills on gradient text. */
 ::selection {
-  background-color: var(--accent-glow-soft);
-  color: var(--text-heading);
+  background-color: #a51c1c;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  text-shadow: none;
 }
 
 /* ── Metallic 3D Accent Text Gradient Utility ────────────────────────────── */

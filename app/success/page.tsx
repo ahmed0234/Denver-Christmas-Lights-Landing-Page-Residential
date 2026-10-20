@@ -1,139 +1,115 @@
-"use client";
-
+import CallCard from "@/components/landing/CallCard";
+import { Icon, IconSprite, LineIcon } from "@/components/landing/Icons";
+import SiteHeader from "@/components/landing/SiteHeader";
+import StringLights from "@/components/landing/StringLights";
+import { PHONE_DISPLAY, PHONE_HREF } from "@/components/landing/content";
+import { montserrat, openSans } from "@/components/landing/fonts";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2, Phone, ArrowLeft, Sparkles, Snowflake, Calendar, ShieldCheck } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { handlePhoneCallClick } from "@/lib/gtag";
+import "../landing.css";
+import "./success.css";
+
+export const metadata: Metadata = {
+  title: "Thank You | Denver Christmas Lights",
+  description:
+    "Your free Christmas light quote request has been received. Here's what happens next.",
+  robots: { index: false, follow: false },
+};
+
+const NEXT_STEPS: { title: string; text: string }[] = [
+  {
+    title: "We Review Your Home",
+    text: "We look over your property details, roofline and lighting style so we understand exactly what you have in mind.",
+  },
+  {
+    title: "We Give You a Call",
+    text: "A member of our team reaches out within 24 hours to answer questions and talk through design ideas.",
+  },
+  {
+    title: "You Get Your Lighting Plan",
+    text: "We send a clear, written proposal with your custom design and pricing. No surprises, no pressure.",
+  },
+  {
+    title: "We Light Up Your Home",
+    text: "Once approved, we schedule your install date, keep everything shining all season and take it down after.",
+  },
+];
 
 export default function SuccessPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg-primary,#080807)] text-white flex flex-col justify-between relative overflow-hidden">
-      <Navbar />
+    <div className={`dcl ${montserrat.variable} ${openSans.variable}`}>
+      <IconSprite />
+      <SiteHeader base="/" />
+      <StringLights />
 
-      {/* Atmospheric Ambient Glows */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full pointer-events-none z-0"
-        style={{
-          background: "radial-gradient(circle, var(--accent-glow-soft) 0%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
-
-      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-32 sm:pt-40 pb-20 flex-1 flex flex-col justify-center items-center text-center">
-        {/* Animated Check Icon */}
-        <div
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mb-6 shadow-2xl relative transition-transform duration-500 hover:scale-105"
-          style={{
-            background: "linear-gradient(135deg, rgba(245, 200, 106, 0.25) 0%, rgba(229, 169, 50, 0.1) 100%)",
-            border: "2px solid var(--accent)",
-            boxShadow: "0 0 35px var(--accent-glow), inset 0 1px 0 var(--highlight-surface)",
-          }}
-        >
-          <CheckCircle2
-            className="w-10 h-10 sm:w-12 sm:h-12 text-amber-300 stroke-[2.2]"
-            style={{ filter: "drop-shadow(0 0 8px var(--accent-glow))" }}
-          />
-        </div>
-
-        {/* Header Eyebrow */}
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={16} className="text-amber-400" />
-          <span className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--accent)]">
-            INQUIRY RECEIVED
+      <main className="ty">
+        <div className="wrap narrow">
+          <span className="ty-tag">
+            <i aria-hidden="true" />
+            Thanks! We got your request
           </span>
-          <Sparkles size={16} className="text-amber-400" />
-        </div>
+          <h1>
+            Here&rsquo;s What <span>Happens Next.</span>
+          </h1>
+          <p className="ty-lead">
+            Your free quote request is in. A Denver Christmas Lights specialist
+            will review your details and reach out soon to help plan your
+            holiday display.
+          </p>
 
-        {/* Main Heading */}
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight font-sans">
-          Thank You for Requesting Your <br />
-          <span className="text-accent-gradient">Free Christmas Light Quote!</span>
-        </h1>
+          <ol className="ty-steps">
+            {NEXT_STEPS.map((s, i) => (
+              <li key={s.title}>
+                <span className="ty-num">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </li>
+            ))}
+          </ol>
 
-        {/* Description */}
-        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-xl mb-10 leading-relaxed">
-          Your information has been sent to our team. A Denver Christmas Lights design specialist will review your property details and reach out within 24 hours.
-        </p>
-
-        {/* Information Glass Card */}
-        <div
-          className="w-full rounded-2xl p-6 sm:p-8 mb-10 border text-left relative overflow-hidden"
-          style={{
-            background: "linear-gradient(180deg, var(--bg-glass-card) 0%, var(--bg-overlay) 100%)",
-            borderColor: "var(--border-color)",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 var(--highlight-surface)",
-            backdropFilter: "blur(20px)",
-          }}
-        >
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
-            <Snowflake size={20} className="text-amber-400 shrink-0" />
-            <h2 className="text-lg font-bold text-[var(--text-heading)]">What Happens Next?</h2>
+          <div className="ty-card">
+            <div className="ty-note">
+              <span className="ty-check">
+                <Icon
+                  name="check"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                />
+              </span>
+              <div>
+                <h3>No guesswork, no pressure.</h3>
+                <p>
+                  We&rsquo;ll keep you updated from the first call to your
+                  install date. Have a question about your quote or want to lock
+                  in a date sooner? Give us a call.
+                </p>
+              </div>
+            </div>
+            <CallCard />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
-                <Calendar size={14} /> 1. Property Review
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                We review roofline lengths, tree displays, and custom layout options for your home.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
-                <Phone size={14} /> 2. Fast Consultation
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                We reach out via phone or email to present your custom estimate and schedule installation.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-wider">
-                <ShieldCheck size={14} /> 3. Worry-Free Season
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Professional installation, season-long maintenance, and post-holiday removal included.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
-          <Link
-            href="/"
-            className="group relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase border text-white hover:text-amber-200 transition-all duration-300"
-            style={{
-              borderColor: "var(--border-color)",
-              background: "var(--bg-glass)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
-            }}
-          >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Return to Website</span>
+          <Link href="/" className="ty-back">
+            <LineIcon name="arrow" />
+            Back to home
           </Link>
-
-          <a
-            href="tel:7202967711"
-            onClick={handlePhoneCallClick}
-            className="relative flex items-center justify-center gap-2.5 w-full sm:w-auto px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase overflow-hidden cursor-pointer shadow-lg transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
-            style={{
-              background: `linear-gradient(180deg, #FFF4CE 0%, #F5C86A 32%, #E5A932 70%, #B87B15 100%)`,
-              border: "1px solid rgba(255, 235, 170, 0.85)",
-              color: "#241200",
-              boxShadow: "0 4px 22px rgba(245, 200, 106, 0.38)",
-            }}
-          >
-            <Phone size={16} className="shrink-0 text-amber-950" />
-            <span className="text-amber-950">Call (720) 296-7711</span>
-          </a>
         </div>
-      </div>
+      </main>
 
-      <Footer />
-    </main>
+      <footer>
+        <div className="wrap">
+          <div className="fbottom">
+            <span>
+              © {new Date().getFullYear()} Denver Christmas Lights. All rights
+              reserved.
+            </span>
+            <span>
+              <a href={PHONE_HREF}>{PHONE_DISPLAY}</a> · Fully insured · Locally
+              owned
+            </span>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
