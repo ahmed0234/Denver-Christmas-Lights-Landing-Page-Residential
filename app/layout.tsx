@@ -40,12 +40,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <head>
-        {/* Google Tag (gtag.js) - Loaded during browser idle time for 0 TBT impact */}
+        {/* Google Tag (gtag.js) - Loaded before hydration so ad clicks and conversions are recorded as early as possible */}
         <Script
-          strategy="lazyOnload"
+          strategy="beforeInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=AW-959322441"
         />
-        <Script id="google-gtag-init" strategy="lazyOnload">
+        <Script id="google-gtag-init" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -55,7 +55,7 @@ export default function RootLayout({
           `}
         </Script>
         {/* Google Ads Phone Call Conversion Tracking Snippet */}
-        <Script id="google-phone-conversion" strategy="lazyOnload">
+        <Script id="google-phone-conversion" strategy="beforeInteractive">
           {`
             gtag('config', 'AW-959322441/yn4TCPqn09wcEMmyuMkD', {
               'phone_conversion_number': '(720) 296-7711'
@@ -63,7 +63,7 @@ export default function RootLayout({
           `}
         </Script>
         {/* Google Ads Onclick Call Conversion Helper */}
-        <Script id="gtag-report-conversion" strategy="lazyOnload">
+        <Script id="gtag-report-conversion" strategy="beforeInteractive">
           {`
             function gtag_report_conversion(url) {
               var callback = function () {

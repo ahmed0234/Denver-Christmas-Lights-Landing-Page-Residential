@@ -517,7 +517,7 @@ export default function Home() {
           </div>
           <p className="area-note">
             Don&apos;t see your area listed?{" "}
-            <a href="#contact">
+            <a href="#quote">
               <b>Contact us</b>
             </a>{" "}
             to check service at your address.
@@ -682,7 +682,10 @@ export default function Home() {
               © {new Date().getFullYear()} Denver Christmas Lights. All rights
               reserved.
             </span>
-            <span>Fully insured · Locally owned</span>
+            <span>
+              Fully insured · Locally owned ·{" "}
+              <a href="/privacy-policy">Privacy Policy</a>
+            </span>
           </div>
         </div>
       </footer>

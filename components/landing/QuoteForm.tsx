@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { CONTACT_API_URL } from "@/lib/api";
 import { PHONE_DISPLAY } from "./content";
 
@@ -36,6 +36,24 @@ const COPY: Record<Variant, { title: string; note: string; submit: string }> = {
   },
 };
 
+const GCLID_KEY = "dcl_gclid";
+const GCLID_TTL_MS = 90 * 24 * 60 * 60 * 1000; // Google Ads click window
+
+/** Google Ads click ID from the URL (saved for return visits), else the saved one if still fresh. */
+function getGclid(): string {
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get("gclid");
+    if (fromUrl) {
+      localStorage.setItem(GCLID_KEY, JSON.stringify({ value: fromUrl, expires: Date.now() + GCLID_TTL_MS }));
+      return fromUrl;
+    }
+    const saved = JSON.parse(localStorage.getItem(GCLID_KEY) || "null");
+    return saved && saved.expires > Date.now() ? String(saved.value) : "";
+  } catch {
+    return "";
+  }
+}
+
 /** Posts to the backend /api/contact and redirects to /success (which fires the Ads conversion). */
 export default function QuoteForm({ variant }: { variant: Variant }) {
   const router = useRouter();
@@ -43,6 +61,11 @@ export default function QuoteForm({ variant }: { variant: Variant }) {
   const [error, setError] = useState("");
   const id = (field: string) => (variant === "hero" ? field : `c-${field}`);
   const copy = COPY[variant];
+
+  // Save the click ID as soon as the visitor lands from an ad
+  useEffect(() => {
+    getGclid();
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,6 +90,7 @@ export default function QuoteForm({ variant }: { variant: Variant }) {
               : service === "Choose one" ? "" : service,
           message: field("message"),
           honeypot: field("company"),
+          gclid: getGclid(),
         }),
       });
       const result = await res.json().catch(() => ({}));
