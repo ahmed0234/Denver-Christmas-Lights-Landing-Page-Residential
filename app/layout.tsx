@@ -23,11 +23,8 @@ export const metadata: Metadata = {
     "Residential Christmas Light Installation Denver | Denver Christmas Lights",
   description:
     "Professional residential Christmas light installation in Denver. Custom design, installation, maintenance, takedown and seasonal support. Request your free quote.",
-  icons: {
-    icon: "/NavbarLogo.png",
-    shortcut: "/NavbarLogo.png",
-    apple: "/NavbarLogo.png",
-  },
+  // Favicons come from app/favicon.ico, app/icon.png and app/apple-icon.png
+  // (generated from public/NewLogo.png); the web manifest is app/manifest.ts.
 };
 
 export default function RootLayout({
