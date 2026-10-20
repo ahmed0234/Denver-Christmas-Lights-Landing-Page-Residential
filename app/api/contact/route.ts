@@ -309,8 +309,9 @@ export async function POST(req: NextRequest) {
   }
   console.log("[contact API] Step 3: RESEND_API_KEY Loaded Successfully (Prefix:", resendApiKey.substring(0, 6) + "...)");
 
-  /* Each recipient comes from its own env var; missing or blank ones are skipped */
-  const recipients = [process.env.BUSINESS_EMAIL_1, process.env.BUSINESS_EMAIL_2]
+  /* Each recipient comes from its own env var; missing or blank ones are skipped.
+     BUSINESS_EMAIL is honored as a fallback for BUSINESS_EMAIL_1 (matches the commercial site). */
+  const recipients = [process.env.BUSINESS_EMAIL_1 ?? process.env.BUSINESS_EMAIL, process.env.BUSINESS_EMAIL_2]
     .map((value) => (value ?? "").trim())
     .filter(Boolean);
 
